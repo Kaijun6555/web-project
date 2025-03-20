@@ -1,3 +1,3 @@
 <footer class="container">
-    <p>Copyright &copy; 2023 World of Pets Pte. Ltd.</p>
+    <p>Copyright &copy; 2025 World of Food Pte. Ltd.</p>
 </footer>
