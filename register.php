@@ -9,10 +9,10 @@ include "inc/head.inc.php";
     include "inc/nav.inc.php";
     ?>
     <main class="container">
-        <h1>Member Registration</h1>
+        <h1>Sign Up</h1>
         <p>
-            For existing members, please go to the
-            <a href="#">Sign In page</a>.
+            For existing members, please 
+            <a href="#">Login</a>.
         </p>
         <form action="process_register.php" method="post" >
 

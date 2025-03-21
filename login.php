@@ -9,10 +9,10 @@ include "inc/head.inc.php";
     include "inc/nav.inc.php";
     ?>
     <main class="container">
-        <h1>Member Login</h1>
+        <h1>Login</h1>
         <p>
-            New Member? Please go to the
-            <a href="#">Member Registration page</a>.
+            New User? Please go to the
+            <a href="#">Sign Up Here!</a>.
         </p>
         <form action="process_login.php" method="post" novalidate>
 
