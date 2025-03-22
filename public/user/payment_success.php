@@ -11,7 +11,7 @@ if (!isset($_GET['tx'])) {
     exit();
 }
 
-$transaction_id = $_GET['tx']; // PayPal transaction ID
+$transaction_id = $_GET['tx']; 
 $total_price = 0;
 
 // Save order to database

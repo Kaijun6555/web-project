@@ -2,17 +2,17 @@
 <html lang="en">
     <head>
         <title>Food</title>
-        <?php include 'inc/head.inc.php'; ?>
+        <?php include '../inc/head.inc.php'; ?>
     </head>
     <body>
-        <?php include 'inc/nav.inc.php'; ?>         
-        <?php include 'inc/header.inc.php'; ?>
+        <?php include '../inc/nav.inc.php'; ?>         
+        <?php include '../inc/header.inc.php'; ?>
         <main class="container">
             <h2>Restaurants</h2>
             <div class="row">
                 <?php
-                require 'db-connect.php';
-                $stmt = $conn->prepare("SELECT id, name, description FROM restaurants ORDER BY name");
+                require '../db/db-connect.php';
+                $stmt = $conn->prepare("SELECT idrestaurant, name, address FROM restaurant ORDER BY name");
                 $stmt->execute();
                 $result = $stmt->get_result();
                 $stmt->close();
@@ -31,6 +31,6 @@
                 <?php endwhile; ?>
             </div>
         </main>
-        <?php include 'inc/footer.inc.php'; ?>            
+        <?php include '../inc/footer.inc.php'; ?>            
     </body>
 </html>

@@ -1,8 +1,8 @@
 <!-- register.php -->
 <?php
-include 'inc/head.inc.php';
-include 'inc/nav.inc.php';
-require 'db-connect.php';
+include '../inc/head.inc.php';
+include '../inc/nav.inc.php';
+require '../../db/db-connect.php';
 
 function sanitize_input($data)
 {
@@ -17,7 +17,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $email = sanitize_input($_POST['email']);
     $password = $_POST['password'];
     $confirm_password = $_POST['confirm_password'];
-    
+
     // Validate input
     if (empty($name) || empty($email) || empty($password) || empty($confirm_password)) {
         $error = "All fields are required.";
@@ -26,20 +26,23 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     } elseif ($password !== $confirm_password) {
         $error = "Passwords do not match.";
     } else {
+
         // Hash password
         $hashed_password = password_hash($password, PASSWORD_DEFAULT);
-        
+
         // Check if email already exists
-        $stmt = $conn->prepare("SELECT id FROM users WHERE email = ?");
+        $stmt = $conn->prepare("SELECT idUsers FROM Users WHERE email = ?");
         $stmt->bind_param("s", $email);
         $stmt->execute();
         $stmt->store_result();
+
         if ($stmt->num_rows > 0) {
             $error = "Email is already registered.";
         } else {
             // Insert new user
-            $stmt = $conn->prepare("INSERT INTO users (name, email, password) VALUES (?, ?, ?)");
+            $stmt = $conn->prepare("INSERT INTO Users (name, email, password) VALUES (?, ?, ?)");
             $stmt->bind_param("sss", $name, $email, $hashed_password);
+
             if ($stmt->execute()) {
                 header("Location: login.php?register_success=1");
                 exit();
@@ -53,17 +56,17 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 ?>
 
 <div class="container mt-4">
-    <h2>Register</h2>
+    <h2>Register as a Merchant With Us!</h2>
     <?php if (isset($error)): ?>
         <div class="alert alert-danger"> <?= $error ?> </div>
     <?php endif; ?>
     <form method="POST">
         <div class="mb-3">
-            <label>Name</label>
+            <label>Merchant Name</label>
             <input type="text" name="name" class="form-control" required>
         </div>
         <div class="mb-3">
-            <label>Email</label>
+            <label>Merchant Email</label>
             <input type="email" name="email" class="form-control" required>
         </div>
         <div class="mb-3">
@@ -78,4 +81,4 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     </form>
 </div>
 
-<?php include 'inc/footer.inc.php'; ?>
+<?php include '../inc/footer.inc.php'; ?>

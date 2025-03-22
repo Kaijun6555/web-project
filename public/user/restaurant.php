@@ -2,7 +2,7 @@
 <?php
 include 'inc/head.inc.php';
 include 'inc/nav.inc.php';
-require 'db-connect.php'; // Database connection
+require 'db-connect.php'; 
 session_start(); // Start session for cart functionality
 
 // Get restaurant ID from URL

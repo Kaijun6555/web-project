@@ -18,7 +18,7 @@ $stmt->close();
 
 <div class="container mt-4">
     <h2>My Orders</h2>
-    
+
     <?php if ($result->num_rows > 0): ?>
         <table class="table">
             <thead>
