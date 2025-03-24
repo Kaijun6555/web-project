@@ -30,7 +30,6 @@ if (isset($_SESSION['cart']) && count($_SESSION['cart']) > 0) {
 
 <div class="container mt-4">
     <h2>Your Cart</h2>
-    
     <?php if (!isset($_SESSION['cart']) || count($_SESSION['cart']) === 0): ?>
         <p>Your cart is empty.</p>
     <?php else: ?>
