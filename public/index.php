@@ -68,7 +68,7 @@
         }
 
         function showError(error) {
-            document.getElementById("location").value = -35.249029 + ", " + 148.977341;
+            document.getElementById("location").value = "Can't Get Location";
         }
     </script>
 </body>

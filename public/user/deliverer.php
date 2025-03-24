@@ -19,6 +19,8 @@
     <?php include '../inc/footer.inc.php'; ?>
 
     <script>
+        document.getElementById("user_role_dropdown").innerText = "Deliverer";
+
         function getLocation() {
             if (navigator.geolocation) {
                 navigator.geolocation.getCurrentPosition(sendPosition, showError);
@@ -34,7 +36,7 @@
         }
 
         function showError(error) {
-            document.getElementById("location").value = -35.249029 + ", " + 148.977341;
+            document.getElementById("location").value = "Can't Get Location";
         }
     </script>
 </body>

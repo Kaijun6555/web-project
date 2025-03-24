@@ -1,4 +1,4 @@
-<!-- register.php -->
+<!-- RESTAURANT register.php -->
 <?php
 include '../inc/head.inc.php';
 include '../inc/nav.inc.php';
@@ -31,7 +31,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         $hashed_password = password_hash($password, PASSWORD_DEFAULT);
 
         // Check if email already exists
-        $stmt = $conn->prepare("SELECT idUsers FROM Users WHERE email = ?");
+        $stmt = $conn->prepare("SELECT idrestaurant FROM restaurant WHERE email = ?");
         $stmt->bind_param("s", $email);
         $stmt->execute();
         $stmt->store_result();
@@ -40,11 +40,11 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             $error = "Email is already registered.";
         } else {
             // Insert new user
-            $stmt = $conn->prepare("INSERT INTO Users (name, email, password) VALUES (?, ?, ?)");
+            $stmt = $conn->prepare("INSERT INTO restaurant (name, email, password) VALUES (?, ?, ?)");
             $stmt->bind_param("sss", $name, $email, $hashed_password);
 
             if ($stmt->execute()) {
-                header("Location: login.php?register_success=1");
+                header("Location: restaurant_login.php?register_success=1");
                 exit();
             } else {
                 $error = "Registration failed. Please try again.";
