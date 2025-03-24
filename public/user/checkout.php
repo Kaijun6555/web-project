@@ -1,7 +1,8 @@
 <!-- checkout.php -->
 <?php
-session_start();
 require '../../db/db-connect.php';
+
+session_start();
 
 // Check if cart is empty
 if (!isset($_SESSION['cart']) || count($_SESSION['cart']) === 0) {
@@ -16,10 +17,10 @@ foreach ($_SESSION['cart'] as $item) {
 }
 
 // PayPal Sandbox Settings
-$paypal_url = "https://sandbox.paypal.com";
-$business_email = "sb-vs71r4881472@business.example.com";
-$return_url = "/user/payment_success.php";
-$cancel_url = "/user/payment_cancel.php";
+$paypal_url = "https://www.sandbox.paypal.com/cgi-bin/webscr";
+$business_email = "sb-vcr9d39023297@business.example.com";
+$return_url = "https://www.foodfinder.shop/user/payment_success.php";
+$cancel_url = "https://www.foodfinder.shop/user/payment_cancel.php";
 ?>
 
 <!DOCTYPE html>
@@ -35,7 +36,8 @@ $cancel_url = "/user/payment_cancel.php";
     <div class="container mt-4">
         <h2>Checkout</h2>
         <p><strong>Total Price:</strong> $<?= number_format($total_price, 2) ?></p>
-        <form action="<?= $paypal_url ?>" method="post">
+
+        <form action="<?=$paypal_url?>" method="post">
             <!-- PayPal Business Email -->
             <input type="hidden" name="business" value="<?= $business_email ?>">
 
@@ -50,9 +52,9 @@ $cancel_url = "/user/payment_cancel.php";
             <!-- Submit Button -->
             <button type="submit" class="btn btn-success">Pay with PayPal</button>
         </form>
-        <a href="/" class="btn btn-secondary mt-3">Back to Cart</a>
     </div>
     <?php include '../inc/footer.inc.php'; ?>
+
 </body>
 
 </html>

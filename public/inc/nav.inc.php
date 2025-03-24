@@ -36,7 +36,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST["remove_id"])) {
 
                 <?php if (!empty($_SESSION['user_id'])): ?>
                     <li class="nav-item">
-                        <a class="nav-link" href="user_orders.php">My Orders</a>
+                        <a class="nav-link" href="/user/user_orders.php">My Orders</a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link" href="/logout.php">Logout</a>

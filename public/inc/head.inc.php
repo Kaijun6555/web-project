@@ -12,3 +12,5 @@
 <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
 <!-- Custom JS -->
 <script defer src="/js/main.js"></script>
+<!-- Stripe JS -->
+<script src="https://js.stripe.com/v3/"></script> 

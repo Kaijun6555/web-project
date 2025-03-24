@@ -33,6 +33,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST["menu_id"])) {
     $menu_id = (int) $_POST["menu_id"];
     $menu_name = $_POST["menu_name"];
     $menu_price = (float) $_POST["menu_price"];
+    $restaurant_id = (int) $_POST["restaurant_id"];
 
     if (!isset($_SESSION['cart'])) {
         $_SESSION['cart'] = [];
@@ -41,6 +42,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST["menu_id"])) {
     // Add item to cart
     $_SESSION['cart'][] = [
         'id' => $menu_id,
+        'restaurant_id' => $restaurant_id,
         'name' => $menu_name,
         'price' => $menu_price,
         'quantity' => 1
@@ -127,6 +129,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST["menu_id"])) {
                                 <input type="hidden" name="menu_id" value="<?= $menu_item['idmenu_item'] ?>">
                                 <input type="hidden" name="menu_name" value="<?= htmlspecialchars($menu_item['itemName']) ?>">
                                 <input type="hidden" name="menu_price" value="<?= $menu_item['price'] ?>">
+                                <input type="hidden" name="restaurant_id" value="<?= $menu_item['restaurant_id'] ?>">
                                 <button class="btn btn-success w-100 mt-3" type="submit">
                                     Add to Basket - <?= number_format($menu_item['price'], 2) ?>
                                 </button>
