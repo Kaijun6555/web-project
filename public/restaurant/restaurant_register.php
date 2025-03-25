@@ -1,4 +1,4 @@
-<!-- register.php -->
+<!-- RESTAURANT register.php -->
 <?php
 include '../inc/head.inc.php';
 include '../inc/nav.inc.php';
@@ -14,7 +14,8 @@ function sanitize_input($data)
 
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $name = sanitize_input($_POST['name']);
-    $email = sanitize_input($_POST['email']);
+    $image = $_POST['file'];
+    $$email = sanitize_input($_POST['email']);
     $password = $_POST['password'];
     $confirm_password = $_POST['confirm_password'];
 
@@ -31,7 +32,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         $hashed_password = password_hash($password, PASSWORD_DEFAULT);
 
         // Check if email already exists
-        $stmt = $conn->prepare("SELECT idUsers FROM Users WHERE email = ?");
+        $stmt = $conn->prepare("SELECT idrestaurant FROM restaurant WHERE email = ?");
         $stmt->bind_param("s", $email);
         $stmt->execute();
         $stmt->store_result();
@@ -40,11 +41,11 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             $error = "Email is already registered.";
         } else {
             // Insert new user
-            $stmt = $conn->prepare("INSERT INTO Users (name, email, password) VALUES (?, ?, ?)");
+            $stmt = $conn->prepare("INSERT INTO restaurant (name, image, email, password) VALUES (?, ?, ?)");
             $stmt->bind_param("sss", $name, $email, $hashed_password);
 
             if ($stmt->execute()) {
-                header("Location: login.php?register_success=1");
+                header("Location: restaurant_login.php?register_success=1");
                 exit();
             } else {
                 $error = "Registration failed. Please try again.";
@@ -65,6 +66,15 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             <label>Merchant Name</label>
             <input type="text" name="name" class="form-control" required>
         </div>
+        <div class="mb-3">
+            <label>Store address</label>
+            <input type="text" name="address" class="form-control" required>
+        </div>
+        <div class="mb-3">
+            <label>Merchant Image</label>
+            <input type="file" name="file" class="form-control-file" required>
+        </div>
+
         <div class="mb-3">
             <label>Merchant Email</label>
             <input type="email" name="email" class="form-control" required>

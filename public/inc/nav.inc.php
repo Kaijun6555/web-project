@@ -33,6 +33,9 @@ session_start();
                     <li class="nav-item">
                         <a class="nav-link" href="/user/register.php">Register</a>
                     </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/restaurant/restaurant_login.php">Merchant Centre</a>
+                    </li>
                 <?php endif; ?>
 
                 <li class="nav-item">
