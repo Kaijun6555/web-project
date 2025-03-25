@@ -43,7 +43,7 @@
                         <div class="card-body">
                             <h5 class="card-title"><?= htmlspecialchars($row['name']) ?></h5>
                             <p class="card-text"><?= htmlspecialchars($row['description']) ?></p>
-                            <a href="restaurant.php?id=<?= $row['id'] ?>" class="btn btn-primary">View Menu</a>
+                            <a href="/user/restaurant.php?id=<?= $row['idrestaurant'] ?>" class="btn btn-primary">View Menu</a>
                         </div>
                     </div>
                 </div>

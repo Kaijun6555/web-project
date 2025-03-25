@@ -64,10 +64,11 @@
         <?php if (isset($_GET['register_success'])): ?>
             <div class="alert alert-success">Registration successful! Please log in.</div>
         <?php endif; ?>
+
         <?php if (isset($error)): ?>
             <div class="alert alert-danger"> <?= $error ?> </div>
         <?php endif; ?>
-            <>
+        
         <form method="POST">
             <div class="mb-3">
                 <label>Merchant Email</label>

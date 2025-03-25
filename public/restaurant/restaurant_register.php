@@ -1,4 +1,5 @@
 <!-- RESTAURANT register.php -->
+<!-- RESTAURANT register.php -->
 <?php
 include '../inc/head.inc.php';
 include '../inc/nav.inc.php';
@@ -41,7 +42,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             $error = "Email is already registered.";
         } else {
             // Insert new user
-            $stmt = $conn->prepare("INSERT INTO restaurant (name, image, email, password) VALUES (?, ?, ?)");
+            $stmt = $conn->prepare("INSERT INTO restaurant (name, email, password) VALUES (?, ?, ?)");
             $stmt->bind_param("sss", $name, $email, $hashed_password);
 
             if ($stmt->execute()) {
