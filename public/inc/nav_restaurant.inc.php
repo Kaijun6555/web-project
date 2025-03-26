@@ -46,7 +46,7 @@
                     <i class="fs-4 bi-grid"></i> <span class="ms-1 d-none d-sm-inline">Products</span> </a>
                 <ul class="collapse nav flex-column ms-1" id="submenu3" data-bs-parent="#menu">
                     <li class="w-100">
-                        <a href="#" class="nav-link px-0"> <span class="d-none d-sm-inline">Product</span>
+                        <a href="/restaurant/products.php" class="nav-link px-0"> <span class="d-none d-sm-inline">Products</span>
                             1</a>
                     </li>
                     <li>
