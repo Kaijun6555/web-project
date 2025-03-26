@@ -143,7 +143,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST["menu_id"])) {
         <?php endif; ?>
     </div>
 
-    <?php include 'inc/footer.inc.php'; ?>
+    <?php include '../inc/footer.inc.php'; ?>
 </body>
 
 </html>
