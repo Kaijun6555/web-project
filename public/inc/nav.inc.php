@@ -29,7 +29,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST["remove_id"])) {
             <ul class="navbar-nav me-auto mb-2 mb-lg-0">
 
                 <li class="nav-item">
-                    <a class="nav-link" href="restaurants.php">Restaurants</a>
+                    <a class="nav-link" href="/user/restaurants.php">Restaurants</a>
                 </li>
 
 

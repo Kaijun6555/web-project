@@ -17,7 +17,21 @@ $stmt->execute();
 $orders = $stmt->get_result();
 $stmt->close();
 
+
+if (!$_SESSION['restaurant_id'] == null) {
+    $restaurant_id = $_SESSION['restaurant_id'];
+}
+else {
+    die("Not Logged in");
+}
+
+$stmt = $conn->prepare("SELECT idmenu_item, itemName, price, availability, description, image FROM menu_item WHERE restaurant_id = ? ORDER BY itemName") ;
+$stmt->bind_param("i", $restaurant_id);
+$stmt->execute();
+$menu_result = $stmt->get_result();
+$stmt->close();
 ?>
+
 
 
 <!DOCTYPE html>

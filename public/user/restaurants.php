@@ -1,7 +1,7 @@
 <?php
-include 'inc/head.inc.php';
-include 'inc/nav.inc.php';
-require 'db-connect.php';
+include '../inc/head.inc.php';
+include '../inc/nav.inc.php';
+require '../../db/db-connect.php';
 
 // Get user's IP-based location using `ip-api.com`
 $user_lat = 0;
@@ -32,7 +32,7 @@ $result = $stmt->get_result();
     <ul class="list-group">
         <?php while ($row = $result->fetch_assoc()): ?>
             <li class="list-group-item">
-                <a href="restaurant.php?id=<?= htmlspecialchars($row['id']) ?>">
+                <a href="/user/restaurant.php?id=<?= htmlspecialchars($row['id']) ?>">
                     <?= htmlspecialchars($row['name']) ?> - <?= number_format($row['distance'], 2) ?> km away
                 </a>
             </li>
@@ -40,4 +40,4 @@ $result = $stmt->get_result();
     </ul>
 </div>
 
-<?php include 'inc/footer.inc.php'; ?>
+<?php include '../inc/footer.inc.php'; ?>

@@ -1,14 +1,31 @@
+<?php
+session_start();
+?>
+
 <!DOCTYPE html>
-<html>
+<html lang="en">
+
 <head>
-    <meta charset='utf-8'>
-    <meta http-equiv='X-UA-Compatible' content='IE=edge'>
-    <title>Page Title</title>
-    <meta name='viewport' content='width=device-width, initial-scale=1'>
-    <link rel='stylesheet' type='text/css' media='screen' href='main.css'>
-    <script src='main.js'></script>
+    <title>Food</title>
+    <?php include '../inc/head.inc.php'; ?>
 </head>
+
 <body>
-    
+    <?php include '../inc/nav_restaurant.inc.php'; ?>
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col min-vh-100 py-3">
+                <!-- toggler -->
+                <button class="btn float-end" data-bs-toggle="offcanvas" data-bs-target="#offcanvas" role="button">
+                    <i class="bi bi-arrow-right-square-fill fs-3" data-bs-toggle="offcanvas"
+                        data-bs-target="#offcanvas"></i>
+                </button>
+                Orders
+                
+            </div>
+        </div>
+    </div>
+    <?php include '../inc/footer.inc.php'; ?>
 </body>
+
 </html>
