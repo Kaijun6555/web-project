@@ -46,7 +46,7 @@
                 if (password_verify($password, $hashed_password)) {
                     $_SESSION['restaurant_id'] = $id;
                     $_SESSION['restaurant_name'] = $name;
-                    header("Location: dashboard.php");
+                    header("Location: /dashboard.php");
                     exit();
                 } else {
                     $error = "Incorrect password.";

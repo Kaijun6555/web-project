@@ -1,21 +1,6 @@
 <?php
-require '../../db/db-connect.php';
 session_start();
-
-if (!$_SESSION['restaurant_id'] == null) {
-    $restaurant_id = $_SESSION['restaurant_id'];
-}
-else {
-    die("Not Logged in");
-}
-
-$stmt = $conn->prepare("SELECT idmenu_item, itemName, price, availability, description, image FROM menu_item WHERE restaurant_id = ? ORDER BY itemName") ;
-$stmt->bind_param("i", $restaurant_id);
-$stmt->execute();
-$menu_result = $stmt->get_result();
-$stmt->close();
 ?>
-
 
 <!DOCTYPE html>
 <html lang="en">
@@ -27,7 +12,6 @@ $stmt->close();
 
 <body>
     <?php include '../inc/nav_restaurant.inc.php'; ?>
-    
     <div class="container-fluid">
         <div class="row">
             <div class="col min-vh-100 py-3">
@@ -36,9 +20,8 @@ $stmt->close();
                     <i class="bi bi-arrow-right-square-fill fs-3" data-bs-toggle="offcanvas"
                         data-bs-target="#offcanvas"></i>
                 </button>
-                Dashboard Sales
+                Orders
                 
-
             </div>
         </div>
     </div>

@@ -34,7 +34,7 @@
                 </ul>
             </li>
             <li>
-                <a href="#" class="nav-link text-truncate">
+                <a href="/restaurant/products.php" class="nav-link text-truncate">
                     <i class="fs-5 bi-grid"></i><span class="ms-1 d-none d-sm-inline">Products</span></a>
             </li>
             <li>
