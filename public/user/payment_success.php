@@ -22,7 +22,9 @@ if (isset($_SESSION['cart']) && count($_SESSION['cart']) > 0) {
     }
 
     $restaurant_id = $_SESSION['cart'][0]['restaurant_id'];
-
+    
+    echo $restaurant_id;
+    
     // Insert order
     $stmt = $conn->prepare("INSERT INTO Orders (customer_user_id, total_price, restaurant_id) VALUES (?, ?, ?)");
     $customer_user_id = $_SESSION['user_id'];

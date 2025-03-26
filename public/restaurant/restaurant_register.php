@@ -1,7 +1,5 @@
 <!-- RESTAURANT register.php -->
 <?php
-include '../inc/head.inc.php';
-include '../inc/nav.inc.php';
 require '../../db/db-connect.php';
 
 function sanitize_input($data)
@@ -54,31 +52,44 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     }
 }
 ?>
+<!-- RESTUARANT register.php -->
+<!DOCTYPE html>
+<html lang="en">
 
-<div class="container mt-4">
-    <h2>Register as a Merchant With Us!</h2>
-    <?php if (isset($error)): ?>
-        <div class="alert alert-danger"> <?= $error ?> </div>
-    <?php endif; ?>
-    <form method="POST">
-        <div class="mb-3">
-            <label>Merchant Name</label>
-            <input type="text" name="name" class="form-control" required>
-        </div>
-        <div class="mb-3">
-            <label>Merchant Email</label>
-            <input type="email" name="email" class="form-control" required>
-        </div>
-        <div class="mb-3">
-            <label>Password</label>
-            <input type="password" name="password" class="form-control" required>
-        </div>
-        <div class="mb-3">
-            <label>Confirm Password</label>
-            <input type="password" name="confirm_password" class="form-control" required>
-        </div>
-        <button type="submit" class="btn btn-primary">Register</button>
-    </form>
-</div>
+<head>
+    <title>Food</title>
+    <?php include '../inc/head.inc.php'; ?>
+</head>
 
-<?php include '../inc/footer.inc.php'; ?>
+<body>
+    <?php include '../inc/nav.inc.php'; ?>
+    <div class="container mt-4">
+        <h2>Register as a Merchant With Us!</h2>
+        <?php if (isset($error)): ?>
+            <div class="alert alert-danger"> <?= $error ?> </div>
+        <?php endif; ?>
+        <form method="POST">
+            <div class="mb-3">
+                <label>Merchant Name</label>
+                <input type="text" name="name" class="form-control" required>
+            </div>
+            <div class="mb-3">
+                <label>Merchant Email</label>
+                <input type="email" name="email" class="form-control" required>
+            </div>
+            <div class="mb-3">
+                <label>Password</label>
+                <input type="password" name="password" class="form-control" required>
+            </div>
+            <div class="mb-3">
+                <label>Confirm Password</label>
+                <input type="password" name="confirm_password" class="form-control" required>
+            </div>
+            <button type="submit" class="btn btn-primary">Register</button>
+        </form>
+    </div>
+
+    <?php include '../inc/footer.inc.php'; ?>
+</body>
+
+</html>

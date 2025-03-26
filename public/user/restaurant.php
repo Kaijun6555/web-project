@@ -42,7 +42,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST["menu_id"])) {
     // Add item to cart
     $_SESSION['cart'][] = [
         'id' => $menu_id,
-        'restaurant_id' => $restaurant_id,
+        'restaurant_id' => $id,
         'name' => $menu_name,
         'price' => $menu_price,
         'quantity' => 1

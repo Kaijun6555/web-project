@@ -50,7 +50,7 @@
             <?php endwhile; ?>
         </div>
     </main>
-    <?php include '../inc/footer.inc.php'; ?>
+    <?php include 'inc/footer.inc.php'; ?>
 
     <script>
         function getLocation() {
