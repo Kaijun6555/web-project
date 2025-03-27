@@ -14,7 +14,7 @@
                 <div class="card mt-5">
                     <div class="card-body">
                         <h4 class="card-title">Greetings Foodie!</h4>
-                        <h2 class="card-subtitle mb-2 text-muted">Where are you looking to deliver your food to!</h2>
+                        <h2 class="card-subtitle mb-2 text-muted">Where are you looking to deliver your food to?</h2>
                         <br>
                         <div class="form-group">
                             <!-- <label for="location">Enter Location</label> -->
