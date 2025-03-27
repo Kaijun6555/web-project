@@ -2,6 +2,12 @@
 session_start();
 require '../../db/db-connect.php';
 
+// Check if the user is already logged in (adjust the session variable name as needed)
+if (isset($_SESSION['user_id'])) {
+    header('Location: /index.php');  // Redirect to the homepage or dashboard
+    exit;
+}
+
 function sanitize_input($data)
 {
     $data = trim($data);

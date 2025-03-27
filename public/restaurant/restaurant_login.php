@@ -3,6 +3,12 @@
 session_start();
 require '../../db/db-connect.php';
 
+// Check if the merchant is already logged in (adjust the session variable name as needed)
+if (isset($_SESSION['restaurant_id'])) {
+    header('Location: /restaurant/dashboard.php');  // Redirect to the merchant dashboard
+    exit;
+}
+
 function sanitize_input($data)
 {
     $data = trim($data);

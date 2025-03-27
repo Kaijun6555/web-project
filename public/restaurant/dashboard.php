@@ -4,8 +4,10 @@ $PREPARING_ORDER_STATUS = 2;
 require '../../db/db-connect.php';
 session_start();
 
-if (empty($_SESSION['restaurant_id'])) {
-    die("Not Logged In");
+// If the merchant is not logged in, redirect them to the login page.
+if (!isset($_SESSION['merchant_id'])) {
+    header('Location: /restaurant/restaurant_login.php');
+    exit;
 }
 
 $id = $_SESSION['restaurant_id'];
