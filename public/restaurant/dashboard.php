@@ -4,11 +4,7 @@ $PREPARING_ORDER_STATUS = 2;
 require '../../db/db-connect.php';
 session_start();
 
-// If the merchant is not logged in, redirect them to the login page.
-if (!isset($_SESSION['merchant_id'])) {
-    header('Location: /restaurant/restaurant_login.php');
-    exit;
-}
+
 
 $id = $_SESSION['restaurant_id'];
 
@@ -19,12 +15,12 @@ $stmt->execute();
 $orders = $stmt->get_result();
 $stmt->close();
 
-
+//Redirect misusers to login page if they tries to access merchant dashboard page
 if (!$_SESSION['restaurant_id'] == null) {
     $restaurant_id = $_SESSION['restaurant_id'];
 }
 else {
-    die("Not Logged in");
+    header('Location: /restaurant/restaurant_login.php');
 }
 
 $stmt = $conn->prepare("SELECT idmenu_item, itemName, price, availability, description, image FROM menu_item WHERE restaurant_id = ? ORDER BY itemName") ;
