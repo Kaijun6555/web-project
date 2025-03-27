@@ -89,7 +89,7 @@ $NEW_ORDER_STATUS = 1;
             })
                 .then(response => response.text())
                 .then(data => alert(data))
-                .catch(error => alert( error));
+                .catch(error => alert(error));
         }
 
         function showError(error) {

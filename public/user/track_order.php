@@ -164,7 +164,7 @@ if (isset($_SESSION['cart']) && count($_SESSION['cart']) > 0) {
 
             // Add the "Looking for a deliverer" marker
             marker = new google.maps.Marker({
-                position: { lat: 1.442864, lng: 103.830942 }, // Starting point
+                position: { lat: <?=$user_lat?>, lng: <?=$user_long?> }, // Starting point
                 map: map,
                 icon: '/static/searching-loading.gif', // You can use an animated icon for this state
                 title: "Looking for a deliverer"
@@ -250,11 +250,9 @@ if (isset($_SESSION['cart']) && count($_SESSION['cart']) > 0) {
                 $order = $stmt->get_result();
                 $stmt->close();
 
-                $order_long = $order->fetch_assoc()['order_long'];
-                $order_lat = $order->fetch_assoc()['order_lat'];
                 ?>
                 // Location of customer
-                var end = { lat: <?= $order_lat ?>, lng: <?= $order_long ?> };   // Customer Location
+                var end = { lat: <?= $user_lat ?>, lng: <?= $user_long ?> };   // Customer Location
 
                 directionsService.route(
                     {

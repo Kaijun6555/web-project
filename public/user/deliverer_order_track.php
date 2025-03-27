@@ -240,14 +240,12 @@ if ($row = $order->fetch_assoc()) {  // Fetch order details
                 .then(response => response.json())
                 .then(data => {
                     console.log(data);
-                    button.disable = true;
                 })
                 .catch(error => console.error("Error:", error));
 
         }
 
         function orderDelivered(button) {
-            console.log("Delivery Complete");
             fetch('/requests/process_order_delivered.php', {
                 method: 'POST',
                 headers: {
