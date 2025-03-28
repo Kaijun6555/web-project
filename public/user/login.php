@@ -2,14 +2,17 @@
 session_start();
 require '../../db/db-connect.php';
 
-// Check if the user is already logged in (adjust the session variable name as needed)
+// Check if the user or admin is already logged in
 if (isset($_SESSION['user_id'])) {
-    header('Location: /index.php');  // Redirect to the homepage or dashboard
+    header('Location: /index.php');  // Redirect to the homepage or user dashboard
+    exit;
+}
+if (isset($_SESSION['admin_id'])) {
+    header('Location: /admin/dashboard.php');  // Redirect to the admin dashboard
     exit;
 }
 
-function sanitize_input($data)
-{
+function sanitize_input($data) {
     $data = trim($data);
     $data = stripslashes($data);
     $data = htmlspecialchars($data);
@@ -26,41 +29,58 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     } elseif (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
         $error = "Invalid email format.";
     } else {
-        // Check if user exists
-        $stmt = $conn->prepare("SELECT idUsers, name, password FROM Users WHERE email = ?");
+        // First, check if the admin exists with this email.
+        $stmt = $conn->prepare("SELECT admin_id, admin_password FROM Admin WHERE email = ?");
         $stmt->bind_param("s", $email);
         $stmt->execute();
         $stmt->store_result();
 
         if ($stmt->num_rows > 0) {
-            $stmt->bind_result($id, $name, $hashed_password);
+            $stmt->bind_result($admin_id, $admin_password);
             $stmt->fetch();
+            // For admins, compare MD5-hashed password
+            if (md5($password) === $admin_password) {
+                $_SESSION['admin_id'] = $admin_id;
 
-            // Verify password
-            if (password_verify($password, $hashed_password)) {
-                $_SESSION['user_id'] = $id;
-                $_SESSION['user_name'] = $name;
-                header("Location: /index.php");
+                header("Location: /admin/dashboard.php");
                 exit();
             } else {
                 $error = "Incorrect password.";
             }
+            $stmt->close();
         } else {
-            $error = "No account found with this email.";
+            // If not found in admin table, check the Users table
+            $stmt = $conn->prepare("SELECT idUsers, name, password FROM Users WHERE email = ?");
+            $stmt->bind_param("s", $email);
+            $stmt->execute();
+            $stmt->store_result();
+
+            if ($stmt->num_rows > 0) {
+                $stmt->bind_result($id, $name, $hashed_password);
+                $stmt->fetch();
+                // Verify user password using password_verify
+                if (password_verify($password, $hashed_password)) {
+                    $_SESSION['user_id'] = $id;
+                    $_SESSION['user_name'] = $name;
+                    header("Location: /index.php");
+                    exit();
+                } else {
+                    $error = "Incorrect password.";
+                }
+            } else {
+                $error = "No account found with this email.";
+            }
+            $stmt->close();
         }
-        $stmt->close();
     }
 }
 ?>
-<!-- login.php -->
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <title>Food</title>
     <?php include '../inc/head.inc.php'; ?>
 </head>
-
 <body>
     <?php include '../inc/nav.inc.php'; ?>
     
@@ -90,7 +110,5 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     </div>
 
     <?php include '../inc/footer.inc.php'; ?>
-
 </body>
-
 </html>

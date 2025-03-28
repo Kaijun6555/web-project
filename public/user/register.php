@@ -1,4 +1,3 @@
-<!-- register.php -->
 <?php
 require '../../db/db-connect.php';
 
@@ -24,28 +23,39 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     } elseif ($password !== $confirm_password) {
         $error = "Passwords do not match.";
     } else {
-
-        // Hash password
-        $hashed_password = password_hash($password, PASSWORD_DEFAULT);
-
-        // Check if email already exists
-        $stmt = $conn->prepare("SELECT idUsers FROM Users WHERE email = ?");
+        // First, check if the email exists in the admin table
+        $stmt = $conn->prepare("SELECT admin_id FROM Admin WHERE email = ?");
         $stmt->bind_param("s", $email);
         $stmt->execute();
         $stmt->store_result();
-
         if ($stmt->num_rows > 0) {
             $error = "Email is already registered.";
         } else {
-            // Insert new user
-            $stmt = $conn->prepare("INSERT INTO Users (name, email, password) VALUES (?, ?, ?)");
-            $stmt->bind_param("sss", $name, $email, $hashed_password);
+            $stmt->close();
 
-            if ($stmt->execute()) {
-                header("Location: login.php?register_success=1");
-                exit();
+            // Then, check if the email exists in the Users table
+            $stmt = $conn->prepare("SELECT idUsers FROM Users WHERE email = ?");
+            $stmt->bind_param("s", $email);
+            $stmt->execute();
+            $stmt->store_result();
+            if ($stmt->num_rows > 0) {
+                $error = "Email is already registered.";
             } else {
-                $error = "Registration failed. Please try again.";
+                $stmt->close();
+
+                // Hash password using a secure algorithm
+                $hashed_password = password_hash($password, PASSWORD_DEFAULT);
+
+                // Insert new user
+                $stmt = $conn->prepare("INSERT INTO Users (name, email, password) VALUES (?, ?, ?)");
+                $stmt->bind_param("sss", $name, $email, $hashed_password);
+
+                if ($stmt->execute()) {
+                    header("Location: login.php?register_success=1");
+                    exit();
+                } else {
+                    $error = "Registration failed. Please try again.";
+                }
             }
         }
         $stmt->close();
@@ -54,20 +64,17 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 ?>
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <title>Food</title>
     <?php include '../inc/head.inc.php'; ?>
 </head>
-
 <body>
     <?php include '../inc/nav.inc.php'; ?>
-
 
     <div class="container mt-4">
         <h2>Register</h2>
         <?php if (isset($error)): ?>
-            <div class="alert alert-danger"> <?= $error ?> </div>
+            <div class="alert alert-danger"><?= htmlspecialchars($error) ?></div>
         <?php endif; ?>
         <form method="POST">
             <div class="mb-3">
@@ -91,8 +98,5 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     </div>
 
     <?php include '../inc/footer.inc.php'; ?>
-
-
 </body>
-
 </html>
