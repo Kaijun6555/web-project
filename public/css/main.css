@@ -1,29 +1,52 @@
-.background-orange{
+.background-orange {
     background-color: #FF7E14;
 }
 
-
-#user_role_dropdown{
-    color:white;
+.btn.background-orange:hover {
+    background-color: #CB6818 !important; 
+    border-color: #CB6818 !important;
 }
 
-#map{
+.border-orange {
+    border: 10px solid #FF7E14 !important;
+}
+
+.navbar-button {
+    background-color: white;
+    border: 2px solid white;
+    color: white;
+}
+
+.navbar-button:hover{
+    background-color: #C3C3C3;
+    border: 2px solid white;
+    color: white;
+}
+
+#user_role_dropdown {
+    color: white;
+}
+
+#map {
     width: 100%;
-    height:50vw;
+    height: 50vw;
 }
 
 /* Progress Bar */
 .progress {
     height: 10px;
 }
+
 .progress-bar {
     transition: width 0.5s ease-in-out;
 }
+
 .step {
     text-align: center;
     font-size: 14px;
     font-weight: bold;
 }
+
 .step-circle {
     width: 15px;
     height: 15px;
@@ -32,6 +55,15 @@
     display: inline-block;
     margin-bottom: 5px;
 }
+
 .step-circle.active {
     background-color: red;
 }
+
+.restaurant:hover{
+    background-color: #E2E2E2;
+    transition: all 1s ease;
+}
+
+
+

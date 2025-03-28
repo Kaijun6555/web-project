@@ -86,6 +86,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             </div>
             <button type="submit" class="btn btn-primary">Login</button>
         </form>
+        <a href="/user/register.php">Don't have an account? Sign up Here!</a>
     </div>
 
     <?php include '../inc/footer.inc.php'; ?>

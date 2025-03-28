@@ -89,12 +89,12 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST["menu_id"])) {
                             <p class="card-text"><?= nl2br(htmlspecialchars($menu_item['description'])) ?></p>
                             <span class="text-success">$<?= number_format($menu_item['price'], 2) ?></span>
                             <button class="btn btn-success rounded-circle" data-bs-toggle="offcanvas"
-                                data-bs-target="#foodDetail">
+                                data-bs-target="#foodDetail<?= $menu_item['idmenu_item'] ?>">
                                 <i class="bi bi-plus"></i>
                             </button>
                         </div>
                     </div>
-                    <div class="offcanvas offcanvas-end" tabindex="-1" id="foodDetail">
+                    <div class="offcanvas offcanvas-end" tabindex="-1" id="foodDetail<?= $menu_item['idmenu_item'] ?>">
                         <div class="offcanvas-header">
                             <h5 class="offcanvas-title"><?= htmlspecialchars($menu_item['itemName']) ?></h5>
                             <button type="button" class="btn-close" data-bs-dismiss="offcanvas"></button>

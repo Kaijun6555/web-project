@@ -16,65 +16,67 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST["remove_id"])) {
 }
 ?>
 
-<nav class="background-orange navbar navbar-expand-sm">
+<nav class="background-orange navbar navbar-expand-sm sticky-top">
     <div class="container-fluid">
         <a class="navbar-brand" href="/">
-            <img src="/static/logo.png" alt="FoodFindr" width="221" height="50" />
+            <img src="/static/logo.png" alt="FoodFinder" width="221" height="50" />
         </a>
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent"
             aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
             <span class="navbar-toggler-icon"></span>
         </button>
         <div class="collapse navbar-collapse" id="navbarSupportedContent">
-            <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+            <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
 
-                <li class="nav-item">
-                    <a class="nav-link" href="/user/restaurants.php">Restaurants</a>
-                </li>
-
-
-                <?php if (!empty($_SESSION['user_id'])): ?>
-                    <li class="nav-item">
-                        <a class="nav-link" href="/user/user_orders.php">My Orders</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="/logout.php">Logout</a>
-                    </li>
-                <?php else: ?>
-                    <li class="nav-item">
-                        <a class="nav-link" href="/user/login.php">Login</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="/user/register.php">Register</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="/restaurant/restaurant_login.php">Merchant Centre</a>
+                <?php if (empty($_SESSION['user_id'])): ?>
+                    <li class="nav-item me-3">
+                        <button class="btn navbar-button">
+                            <a class="text-black text-decoration-none" href="/restaurant/restaurant_login.php">
+                                Merchant Centre</a>
+                        </button>
                     </li>
                 <?php endif; ?>
 
-                <li class="nav-item">
-                    <button class="btn btn-primary" data-bs-toggle="offcanvas" data-bs-target="#cart">
-                        <i class="bi bi-cart"></i>
+                <li class="nav-item me-3">
+                    <button class="btn navbar-button" data-bs-toggle="offcanvas" data-bs-target="#cart">
+                        <a class="text-black text-decoration-none">
+                            <i class="bi bi-cart"></i>&nbsp;Cart
+                        </a>
                     </button>
                 </li>
 
-                <li class="nav-item">
-                    <button class="btn btn-primary"><i class="bi bi-bell"></i></button>
-                </li>
+                <?php if (!empty($_SESSION['user_id'])): ?>
+                    <!-- <li class="nav-item">
+                        <a class="nav-link" href="/user/user_orders.php">My Orders</a>
+                    </li> -->
 
-                <li class="nav-item dropdown">
-                    <button class="btn btn-primary dropdown-toggle" id="user_role_dropdown" role="button"
-                        data-bs-toggle="dropdown" aria-expanded="false">
-                        Order Food
-                    </button>
-                    <ul class="dropdown-menu" aria-labelledby="user_role_dropdown">
-                        <li><a class="dropdown-item" href="/" onclick="changeButtonText('Order Food')">Order Food</a>
-                        </li>
-                        <li><a class="dropdown-item" href="/user/deliverer.php"
-                                onclick="changeButtonText('Deliverer')">Be a Deliverer</a>
-                        </li>
-                    </ul>
-                </li>
+                    <li class="nav-item dropdown me-3">
+                        <button class="btn navbar-button dropdown-toggle text-black" id="user_role_dropdown" role="button"
+                            data-bs-toggle="dropdown" aria-expanded="false">
+                            Order Food
+                        </button>
+                        <ul class="dropdown-menu" aria-labelledby="user_role_dropdown">
+                            <li><a class="dropdown-item" href="/" onclick="changeButtonText('Order Food')">Order Food</a>
+                            </li>
+                            <li><a class="dropdown-item" href="/user/deliverer.php"
+                                    onclick="changeButtonText('Deliverer')">Be a Deliverer</a>
+                            </li>
+                        </ul>
+                    </li>
+                    <li class="nav-item me-3">
+                        <button class="btn btn-danger">
+                            <a class="text-white text-decoration-none" href="/logout.php">
+                                Logout</a>
+                        </button>
+                    </li>
+                <?php else: ?>
+                    <li class="nav-item me-3">
+                        <button class="btn navbar-button">
+                            <a class="text-black text-decoration-none" href="/user/login.php"><i
+                                    class="bi bi-person-circle"></i>&nbsp;Login/Register</a>
+                        </button>
+                    </li>
+                <?php endif; ?>
             </ul>
         </div>
     </div>
