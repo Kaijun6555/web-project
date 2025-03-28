@@ -12,16 +12,16 @@ if (isset($_GET['order_id'])) {
     if ($row = $result->fetch_assoc()) {
         $status = "Unset";
         if ($row['status'] == 1){
-            $status = "Looking for Deliverer";
+            $status = "Looking for Rider";
         }
         else if ($row['status'] == 2){
             $status = "Order is being Prepared";
         }
         else if ($row['status'] == 3){
-            $status = "Deliverer is picking up the order";
+            $status = "Rider Pickup";
         }
         else if ($row['status'] == 4){
-            $status = "Deliverer is on the way";
+            $status = "Rider is on the way";                                                                        
         }
         else if ($row['status'] == 5){
             $status = "Order is delivered";

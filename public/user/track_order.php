@@ -1,10 +1,12 @@
 <?php
+
 $google_api_key = "AIzaSyDBM2Uks3o02p1Vx9PAntKYvb-smBVzhCI";
 $NEW_ORDER_STATUS = 1;
 $restaurant_id = 0;
 
 // find API to Change value according to long lat
 $order_address = "SIT Ho Bee Auditorium, 1 Punggol Coast Road";
+
 ?>
 
 <!-- Send out deliver requests by storing order -->
@@ -20,8 +22,13 @@ if (isset($_SESSION['user_location'])) {
     echo "No location saved yet.";
 }
 
-
+// Total price of order
 $total_price = 0;
+
+// Order long and lat
+$order_long = $user_long;
+$order_lat = $user_lat;
+
 if (isset($_SESSION['cart']) && count($_SESSION['cart']) > 0) {
 
     // Compute total
@@ -31,7 +38,7 @@ if (isset($_SESSION['cart']) && count($_SESSION['cart']) > 0) {
     }
 
     // Fetch restaurant long and lat
-    $stmt = $conn->prepare("SELECT `long`, lat FROM restaurant WHERE idrestaurant = ?");
+    $stmt = $conn->prepare("SELECT `long`, lat, name FROM restaurant WHERE idrestaurant = ?");
     $stmt->bind_param("i", $restaurant_id);
     $stmt->execute();
     $result = $stmt->get_result();
@@ -47,8 +54,8 @@ if (isset($_SESSION['cart']) && count($_SESSION['cart']) > 0) {
         $total_price,
         $restaurant_id,
         $NEW_ORDER_STATUS,
-        $user_long,
-        $user_lat,
+        $order_long,
+        $order_lat,
         $order_address
     );
     $stmt->execute();
@@ -65,6 +72,34 @@ if (isset($_SESSION['cart']) && count($_SESSION['cart']) > 0) {
 
     // Clear cart session
     unset($_SESSION['cart']);
+
+    $stmt = $conn->prepare("SELECT menu_item_id, quantity FROM Order_items WHERE order_id = ?");
+    $stmt->bind_param("i", $order_id);
+    $stmt->execute();
+    $items = $stmt->get_result();
+    $stmt->close();
+
+    // Array to store order details
+    $orderDetails = [];
+
+    while ($item = $items->fetch_assoc()) {
+        $menu_item_id = $item['menu_item_id'];
+        $quantity = $item['quantity'];
+
+        // Retrieve menu details using menu_item_id
+        $stmt = $conn->prepare("SELECT itemName FROM menu_item WHERE idmenu_item = ?");
+        $stmt->bind_param("i", $menu_item_id);
+        $stmt->execute();
+        $menu_result = $stmt->get_result();
+
+        if ($menu = $menu_result->fetch_assoc()) {
+            $orderDetails[] = [
+                'name' => $menu['itemName'],
+                'quantity' => $quantity
+            ];
+        }
+        $stmt->close();
+    }
 
 }
 
@@ -90,12 +125,12 @@ if (isset($_SESSION['cart']) && count($_SESSION['cart']) > 0) {
                 <div id="map" style="height: 500px;"></div>
             </div>
             <div class="col-md-6">
-                <h3>Order Status <span id="order-status">Looking For Deliverer</span></h3>
+                <h3>Order Status <span id="order-status">Looking For Rider</span></h3>
                 <div class="text-center">
                     <div class="d-flex justify-content-between">
                         <div class="step">
                             <span class="step-circle active" id="step1"></span>
-                            <div>Looking for Deliverer</div>
+                            <div>Looking for Rider</div>
                         </div>
                         <div class="step">
                             <span class="step-circle" id="step2"></span>
@@ -122,7 +157,59 @@ if (isset($_SESSION['cart']) && count($_SESSION['cart']) > 0) {
             </div>
         </div>
     </div>
+    <!-- Order Delivered Modal -->
+    <div class="modal fade" id="orderDelivered" tabindex="-1" aria-labelledby="modalTitle" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content p-4">
+                <div class="modal-body row">
+                    <div class="col-lg-4 text-center p-4">
+                        <div class="rounded-circle d-inline-block">
+                            <img src="https://cdn-icons-png.flaticon.com/512/845/845646.png" width="50">
+                        </div>
+                        <h4 class="mt-3">Your Order has been Delivered!</h4>
+                        <p class="text-muted">Hope you enjoyed your delivery experience</p>
+                        <button class="btn btn-success w-75 py-2"><a class="text-decoration-none text-white" href="/">Back to Home</a></button>
+                    </div>
 
+                    <div class="col-lg-8 bg-light p-4 rounded">
+                        <div class="d-flex justify-content-between">
+                            <h5>Order Summary</h5>
+                        </div>
+                        <p class="mb-1"><strong>Date</strong></p>
+                        <p class="text-muted small">User name</p>
+
+                        <p class="mb-1"><strong>Restaurant</strong></p>
+                        <p class="text-muted small"><?= $restaurant['name'] ?></p>
+
+                        <div class="bg-white p-3 rounded">
+                            <?php foreach ($orderDetails as $order_item): ?>
+                                <div class="d-flex justify-content-between">
+                                    <span><?= $order_item['quantity'] ?> X <?= $order_item['name'] ?></span>
+                                    <strong>9.9</strong>
+                                </div>
+                            <?php endforeach; ?>
+                            <hr>
+                            <div class="d-flex justify-content-between text-success"><strong>Food Cost</strong>
+                                <strong><?= $total_price ?></strong>
+                            </div>
+                        </div>
+
+                        <div class="mt-3">
+                            <div class="d-flex justify-content-between text-danger">
+                                <span>Delivery Fee</span>
+                                <strong>1.99</strong>
+                            </div>
+                            <hr>
+                            <div class="d-flex justify-content-between text-success">
+                                <strong>Total</strong>
+                                <strong>$<?= $total_price + 1.99 ?></strong>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
     <script>
 
         // Update the Progress Bar
@@ -164,7 +251,7 @@ if (isset($_SESSION['cart']) && count($_SESSION['cart']) > 0) {
 
             // Add the "Looking for a deliverer" marker
             marker = new google.maps.Marker({
-                position: { lat: <?=$user_lat?>, lng: <?=$user_long?> }, // Starting point
+                position: { lat: <?= $user_lat ?>, lng: <?= $user_long ?> }, // Starting point
                 map: map,
                 icon: '/static/searching-loading.gif', // You can use an animated icon for this state
                 title: "Looking for a deliverer"
@@ -190,13 +277,13 @@ if (isset($_SESSION['cart']) && count($_SESSION['cart']) > 0) {
         }
 
         function updateMap(status, delivery_long, delivery_lat) {
-            if (status === "Order is being Prepared" || status === "Deliverer is picking up the order") {
+            if (status === "Order is being Prepared" || status === "Rider Pickup") {
 
                 // Handle Progress Bar
                 if (step === 1) {
                     updateProgress();
                 }
-                if (status === "Deliverer is picking up the order" && step === 2) {
+                if (status === "Rider Pickup" && step === 2) {
                     updateProgress();
                 }
 
@@ -227,7 +314,7 @@ if (isset($_SESSION['cart']) && count($_SESSION['cart']) > 0) {
                 );
             }
 
-            else if (status === "Deliverer is on the way") {
+            else if (status === "Rider is on the way") {
 
                 if (step === 3) {
                     updateProgress();
@@ -249,11 +336,10 @@ if (isset($_SESSION['cart']) && count($_SESSION['cart']) > 0) {
                 $stmt->execute();
                 $order = $stmt->get_result();
                 $stmt->close();
-
                 ?>
-                // Location of customer
-                var end = { lat: <?= $user_lat ?>, lng: <?= $user_long ?> };   // Customer Location
 
+                // Location of customer
+                var end = { lat: <?= $order_lat ?>, lng: <?= $order_long ?> };
                 directionsService.route(
                     {
                         origin: start,
@@ -272,11 +358,18 @@ if (isset($_SESSION['cart']) && count($_SESSION['cart']) > 0) {
             else if (status === "Order is delivered") {
                 if (step === 4) {
                     updateProgress();
+                    deliveryComplete();
+                    return
                 }
-                marker.setMap(null);
-                directionsRenderer.setMap(map);
-                alert("Order Delivered! Enjoy!");
             }
+        }
+
+        function deliveryComplete() {
+            setTimeout(() => {
+                // Display pop up after 3 seconds.
+                let myModal = new bootstrap.Modal(document.getElementById('orderDelivered'));
+                myModal.show();
+            }, 3000);
         }
 
         checkOrderStatus(<?= $order_id ?>);
