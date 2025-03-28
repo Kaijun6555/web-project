@@ -4,7 +4,7 @@ session_start();
 if ($_SESSION['restaurant_id']) {
     $restaurant_id = $_SESSION['restaurant_id'];
 } else {
-    die("Not Logged in");
+    header('Location: /restaurant/restaurant_login.php');
 }
 
 $stmt = $conn->prepare("SELECT idmenu_item, itemName, price, availability, description, image FROM menu_item WHERE restaurant_id = ? ORDER BY itemName");

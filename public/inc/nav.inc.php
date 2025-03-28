@@ -1,5 +1,6 @@
 <?php
 session_start();
+
 // Handle item removal from cart
 if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST["remove_id"])) {
     $remove_id = (int) $_POST["remove_id"];
@@ -14,8 +15,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST["remove_id"])) {
     exit();
 }
 ?>
-
-
 
 <nav class="background-orange navbar navbar-expand-sm">
     <div class="container-fluid">
@@ -122,8 +121,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST["remove_id"])) {
                     foreach ($_SESSION['cart'] as $item) {
                         $total_price += $item['price'] * $item['quantity'];
                     }
-                } 
-            ?>
+                }
+                ?>
             <h4>Total: $<?= number_format($total_price, 2) ?></h4>
             <a href="/user/checkout.php" class="btn btn-primary">Proceed to Checkout</a>
         <?php endif; ?>

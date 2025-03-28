@@ -14,3 +14,6 @@
 <script defer src="/js/main.js"></script>
 <!-- Stripe JS -->
 <script src="https://js.stripe.com/v3/"></script> 
+<!-- Leaflet JS for Maps -->
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
