@@ -55,7 +55,7 @@ $NEW_ORDER_STATUS = 1;
                             </div>
                             <div class="card-footer d-flex justify-content-between align-items-center bg-light">
                                 <span class="text-muted"><i class="bi bi-wallet"></i>&nbsp;SGD$ 1.99</span>
-                                <button class="btn btn-success btn-sm"><a
+                                <button class="btn btn-success btn-sm"><a class="text-decoration-none text-white"
                                         href="/user/deliverer_order_track.php?order_id=<?= $row['idOrders'] ?>">Accept
                                         Order</a></button>
                             </div>

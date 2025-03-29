@@ -6,7 +6,6 @@ $restaurant_id = 0;
 
 // find API to Change value according to long lat
 $order_address = "SIT Ho Bee Auditorium, 1 Punggol Coast Road";
-
 ?>
 
 <!-- Send out deliver requests by storing order -->
@@ -167,7 +166,8 @@ if (isset($_SESSION['cart']) && count($_SESSION['cart']) > 0) {
                         </div>
                         <h4 class="mt-3">Your Order has been Delivered!</h4>
                         <p class="text-muted">Hope you enjoyed your delivery experience</p>
-                        <button class="btn btn-success w-75 py-2"><a class="text-decoration-none text-white" href="/">Back to Home</a></button>
+                        <button class="btn btn-success w-75 py-2"><a class="text-decoration-none text-white"
+                                href="/">Back to Home</a></button>
                     </div>
 
                     <div class="col-lg-8 bg-light p-4 rounded">
@@ -257,7 +257,7 @@ if (isset($_SESSION['cart']) && count($_SESSION['cart']) > 0) {
             });
 
             directionsService = new google.maps.DirectionsService();
-            directionsRenderer = new google.maps.DirectionsRenderer({ suppressMarkers: false });
+            directionsRenderer = new google.maps.DirectionsRenderer({ suppressMarkers: true });
         }
 
 
@@ -268,7 +268,9 @@ if (isset($_SESSION['cart']) && count($_SESSION['cart']) > 0) {
                 .then(data => {
                     if (data.status) {
                         document.getElementById('order-status').innerText = data.status;
-                        updateMap(data.status, data.delivery_long, data.delivery_lat);
+                        if (data.delivery_long && data.delivery_lat) {
+                            updateMap(data.status, data.delivery_long, data.delivery_lat);
+                        }
                     }
                     setTimeout(() => checkOrderStatus(orderId), 3000);
                 })
@@ -276,7 +278,7 @@ if (isset($_SESSION['cart']) && count($_SESSION['cart']) > 0) {
         }
 
         function updateMap(status, delivery_long, delivery_lat) {
-            if (status === "Order is being Prepared" || status === "Rider Pickup") {
+            if ((status === "Order is being Prepared" || status === "Rider Pickup")) {
 
                 // Handle Progress Bar
                 if (step === 1) {
@@ -295,8 +297,10 @@ if (isset($_SESSION['cart']) && count($_SESSION['cart']) > 0) {
                     lat: parseFloat(delivery_lat),
                     lng: parseFloat(delivery_long)
                 };
-                
+
                 var end = { lat: <?= $restaurant['lat'] ?>, lng: <?= $restaurant['long'] ?> };
+
+
 
                 directionsService.route(
                     {
@@ -307,6 +311,27 @@ if (isset($_SESSION['cart']) && count($_SESSION['cart']) > 0) {
                     (response, status) => {
                         if (status === "OK") {
                             directionsRenderer.setDirections(response);
+                            // Set marker at the delivery rider's location with start icon
+                            var startMarker = new google.maps.Marker({
+                                position: start,
+                                map: map,
+                                icon: {
+                                    url: "https://foodfinder.shop/static/ridericon.png",
+                                    scaledSize: new google.maps.Size(50, 50),
+                                    anchor: new google.maps.Point(25, 50)
+                                }
+                            });
+
+                            // Set marker at the restaurant's location with end icon
+                            var endMarker = new google.maps.Marker({
+                                position: end,
+                                map: map,
+                                icon: {
+                                    url: "https://foodfinder.shop/static/foodplace.png",
+                                    scaledSize: new google.maps.Size(50, 50),
+                                    anchor: new google.maps.Point(25, 50)
+                                }
+                            });
                         } else {
                             alert("Directions request failed due to " + status);
                         }
@@ -340,6 +365,7 @@ if (isset($_SESSION['cart']) && count($_SESSION['cart']) > 0) {
 
                 // Location of customer
                 var end = { lat: <?= $order_lat ?>, lng: <?= $order_long ?> };
+
                 directionsService.route(
                     {
                         origin: start,
@@ -349,6 +375,27 @@ if (isset($_SESSION['cart']) && count($_SESSION['cart']) > 0) {
                     (response, status) => {
                         if (status === "OK") {
                             directionsRenderer.setDirections(response);
+                            // Set marker at the delivery rider's location with start icon
+                            var startMarker = new google.maps.Marker({
+                                position: start,
+                                map: map,
+                                icon: {
+                                    url: "https://foodfinder.shop/static/ridericon.png",
+                                    scaledSize: new google.maps.Size(50, 50),
+                                    anchor: new google.maps.Point(25, 50)
+                                }
+                            });
+
+                            // Set marker at the restaurant's location with end icon
+                            var endMarker = new google.maps.Marker({
+                                position: end,
+                                map: map,
+                                icon: {
+                                    url: "https://foodfinder.shop/static/mylocation.png",
+                                    scaledSize: new google.maps.Size(50, 50),
+                                    anchor: new google.maps.Point(25, 50)
+                                }
+                            });
                         } else {
                             console.log("Directions request failed due to " + status);
                         }

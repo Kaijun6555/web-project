@@ -79,8 +79,9 @@ if ($row = $order->fetch_assoc()) {  // Fetch order details
 <head>
     <title>Deliverer Track Order</title>
     <?php include '../inc/head.inc.php'; ?>
+
     <script async defer
-        src="https://maps.googleapis.com/maps/api/js?key=<?= $google_api_key ?>&callback=initMap"></script>
+        src="https://maps.googleapis.com/maps/api/js?key=<?= $google_api_key ?>&libraries=places"></script>
 
     <script
         src="https://www.paypal.com/sdk/js?client-id=AYX3VoAfHt6l59ysb2FMJejhy4yFe670slGGzQw9H7R5ezdH8yfGzAhdeX2rn9mrWER6YxQi9eKXi-3E&components=buttons"></script>
@@ -155,205 +156,148 @@ if ($row = $order->fetch_assoc()) {  // Fetch order details
 
     <script defer>
 
-
-        let map;
-        let directionsService;
-        let directionsRenderer;
-        let userMarker;
-        let watchId;
-        let currentDestination;
+        // Map Variables
+        let map, marker, directionsService, directionsRenderer;
 
         function initMap() {
-            // Initialize map with error handling and improved configuration
-            try {
-                // Restaurant's initial location (from PHP or dynamic source)
-                currentDestination = {
-                    lat: <?= $restaurant_lat ?>,
-                    lng: <?= $restaurant_long ?>
+            map = new google.maps.Map(document.getElementById('map'), {
+                center: { lat: <?= $user_lat ?>, lng: <?= $user_long ?> },
+                zoom: 17,
+                disableDefaultUI: true,
+                styles: [
+                    {
+                        featureType: 'all',
+                        elementType: 'labels',
+                        stylers: [{ visibility: 'off' }],
+                    },
+                    {
+                        featureType: 'road',
+                        elementType: 'geometry',
+                        stylers: [{ color: '#ffffff' }],
+                    },
+                ],
+            });
+
+
+            // Add the "Looking for a deliverer" marker
+            marker = new google.maps.Marker({
+                position: { lat: <?= $user_lat ?>, lng: <?= $user_long ?> }, // Starting point
+                map: map,
+                icon: '/static/searching-loading.gif', // You can use an animated icon for this state
+            });
+
+            directionsService = new google.maps.DirectionsService();
+            directionsRenderer = new google.maps.DirectionsRenderer({ suppressMarkers: true });
+        }
+
+        function updateMap(status, delivery_long, delivery_lat) {
+            if ((status === "Order is being Prepared" || status === "Rider Pickup")) {
+
+                // Resetting the map.
+                marker.setMap(null);
+                directionsRenderer.setMap(map);
+
+                // Delivery Rider Live Location
+                var start = {
+                    lat: parseFloat(delivery_lat),
+                    lng: parseFloat(delivery_long)
                 };
 
-                // Create map with enhanced options
-                map = new google.maps.Map(document.getElementById("map"), {
-                    center: currentDestination,
-                    zoom: 14,
-                    mapTypeControl: false,
-                    streetViewControl: false,
-                    fullscreenControl: true,
-                    styles: [
-                        // Optional: Add custom map styling for better readability
-                        {
-                            featureType: "poi",
-                            elementType: "labels",
-                            stylers: [{ visibility: "off" }]
+                var end = { lat: <?= $restaurant['lat'] ?>, lng: <?= $restaurant['long'] ?> };
+
+                directionsService.route(
+                    {
+                        origin: start,
+                        destination: end,
+                        travelMode: google.maps.TravelMode.WALKING
+                    },
+                    (response, status) => {
+                        if (status === "OK") {
+                            directionsRenderer.setDirections(response);
+                            // Set marker at the delivery rider's location with start icon
+                            var startMarker = new google.maps.Marker({
+                                position: start,
+                                map: map,
+                                icon: {
+                                    url: "https://foodfinder.shop/static/ridericon.png",
+                                    scaledSize: new google.maps.Size(50, 50),
+                                    anchor: new google.maps.Point(25, 50)
+                                }
+                            });
+
+                            // Set marker at the restaurant's location with end icon
+                            var endMarker = new google.maps.Marker({
+                                position: end,
+                                map: map,
+                                icon: {
+                                    url: "https://foodfinder.shop/static/foodplace.png",
+                                    scaledSize: new google.maps.Size(50, 50),
+                                    anchor: new google.maps.Point(25, 50)
+                                }
+                            });
+                        } else {
+                            alert("Directions request failed due to " + status);
                         }
-                    ]
-                });
-
-                // Initialize directions service and renderer
-                directionsService = new google.maps.DirectionsService();
-                directionsRenderer = new google.maps.DirectionsRenderer({
-                    map: map,
-                    suppressMarkers: true, // Hide default markers
-                    polylineOptions: {
-                        strokeColor: '#0000FF',
-                        strokeOpacity: 0.8,
-                        strokeWeight: 5
                     }
-                });
+                );
+            }
 
-                // Add destination marker
-                new google.maps.Marker({
-                    position: currentDestination,
-                    map: map,
-                    title: "Restaurant Location",
-                    icon: {
-                        url: "https://maps.google.com/mapfiles/ms/icons/red-dot.png",
-                        scaledSize: new google.maps.Size(40, 40)
+
+            else if (status === "Rider is on the way") {
+
+                // Order on the way
+                marker.setMap(null);
+                directionsRenderer.setMap(map);
+
+                // Live location of delivery rider
+                var start = {
+                    lat: parseFloat(delivery_lat),
+                    lng: parseFloat(delivery_long)
+                };
+
+                // Location of customer
+                var end = { lat: <?= $order_lat ?>, lng: <?= $order_long ?> };
+
+                directionsService.route(
+                    {
+                        origin: start,
+                        destination: end,
+                        travelMode: google.maps.TravelMode.WALKING
+                    },
+                    (response, status) => {
+                        if (status === "OK") {
+                            directionsRenderer.setDirections(response);
+                            // Set marker at the delivery rider's location with start icon
+                            var startMarker = new google.maps.Marker({
+                                position: start,
+                                map: map,
+                                icon: {
+                                    url: "https://foodfinder.shop/static/ridericon.png",
+                                    scaledSize: new google.maps.Size(50, 50),
+                                    anchor: new google.maps.Point(25, 50)
+                                }
+                            });
+
+                            // Set marker at the restaurant's location with end icon
+                            var endMarker = new google.maps.Marker({
+                                position: end,
+                                map: map,
+                                icon: {
+                                    url: "https://foodfinder.shop/static/mylocation.png",
+                                    scaledSize: new google.maps.Size(50, 50),
+                                    anchor: new google.maps.Point(25, 50)
+                                }
+                            });
+                        } else {
+                            console.log("Directions request failed due to " + status);
+                        }
                     }
-                });
-
-                // Check geolocation support with comprehensive error handling
-                if ("geolocation" in navigator) {
-                    initializeUserTracking();
-                } else {
-                    handleGeolocationError("Geolocation not supported");
-                }
-            } catch (error) {
-                console.error("Map initialization error:", error);
-                alert("Unable to load map. Please refresh or check your connection.");
+                );
             }
+
         }
 
-        function initializeUserTracking() {
-            watchId = navigator.geolocation.watchPosition(
-                (position) => {
-                    const userLocation = {
-                        lat: position.coords.latitude,
-                        lng: position.coords.longitude
-                    };
 
-                    // Create or update user marker
-                    if (!userMarker) {
-                        userMarker = new google.maps.Marker({
-                            position: userLocation,
-                            map: map,
-                            title: "Your Location",
-                            icon: {
-                                url: "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='30' height='30' viewBox='0 0 24 24' fill='%23007bff'><path d='M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z'/></svg>",
-                                scaledSize: new google.maps.Size(30, 30)
-                            }
-                        });
-                    } else {
-                        userMarker.setPosition(userLocation);
-                    }
-
-                    // Calculate and display route
-                    calculateAndDisplayRoute(userLocation, currentDestination);
-                },
-                handleGeolocationError,
-                {
-                    enableHighAccuracy: true,
-                    timeout: 10000,
-                    maximumAge: 30000
-                }
-            );
-        }
-
-        function calculateAndDisplayRoute(origin, destination) {
-            directionsService.route(
-                {
-                    origin: origin,
-                    destination: destination,
-                    travelMode: google.maps.TravelMode.WALKING
-                },
-                (response, status) => {
-                    if (status === google.maps.DirectionsStatus.OK) {
-                        directionsRenderer.setDirections(response);
-
-                        // Optional: Display route distance and duration
-                        const route = response.routes[0];
-                        const leg = route.legs[0];
-                        displayRouteInfo(leg.distance.text, leg.duration.text);
-                    } else {
-                        console.error("Directions request failed:", status);
-                    }
-                }
-            );
-        }
-
-        function displayRouteInfo(distance, duration) {
-            const infoElement = document.getElementById('route-info');
-            if (infoElement) {
-                infoElement.innerHTML = `Distance: ${distance} | Estimated Time: ${duration}`;
-            }
-        }
-
-        function changeDestination(lat, lng, name = "New Destination") {
-            try {
-                currentDestination = { lat, lng };
-
-                // Recenter map
-                map.setCenter(currentDestination);
-
-                // Update destination marker
-                new google.maps.Marker({
-                    position: currentDestination,
-                    map: map,
-                    title: name,
-                    icon: {
-                        url: "https://maps.google.com/mapfiles/ms/icons/red-dot.png",
-                        scaledSize: new google.maps.Size(40, 40)
-                    }
-                });
-
-                // Trigger route recalculation
-                if (navigator.geolocation) {
-                    navigator.geolocation.getCurrentPosition(
-                        (position) => {
-                            const userLocation = {
-                                lat: position.coords.latitude,
-                                lng: position.coords.longitude
-                            };
-                            calculateAndDisplayRoute(userLocation, currentDestination);
-                        },
-                        handleGeolocationError
-                    );
-                }
-            } catch (error) {
-                console.error("Destination change error:", error);
-            }
-        }
-
-        function handleGeolocationError(error) {
-            let errorMessage = "Unknown error";
-            switch (error.code) {
-                case error.PERMISSION_DENIED:
-                    errorMessage = "Location access denied. Please enable location permissions.";
-                    break;
-                case error.POSITION_UNAVAILABLE:
-                    errorMessage = "Location information unavailable.";
-                    break;
-                case error.TIMEOUT:
-                    errorMessage = "Location request timed out.";
-                    break;
-            }
-            console.error(errorMessage);
-
-            // Optional: Display error to user
-            const errorElement = document.getElementById('location-error');
-            if (errorElement) {
-                errorElement.textContent = errorMessage;
-            }
-        }
-
-        function stopTracking() {
-            if (watchId) {
-                navigator.geolocation.clearWatch(watchId);
-                watchId = null;
-            }
-        }
-        // Cleanup function for page unload or component destruction
-        window.addEventListener('unload', stopTracking);
         // Handle the form submission
         document.getElementById('paypalForm').addEventListener('submit', function (event) {
             event.preventDefault();
@@ -373,9 +317,10 @@ if ($row = $order->fetch_assoc()) {  // Fetch order details
             })
                 .then(response => response.json())
                 .then(data => {
-                    alert(data.message);
                     alert("Payment has been made to your email! Thank you for delivering with us.");
-                    window.location.href = "/";
+                    setTimeout(() => {
+                        window.location.href = "/";
+                    }, 500); 
                 })
                 .catch(error => {
                     console.error('Error:', error);
@@ -389,19 +334,15 @@ if ($row = $order->fetch_assoc()) {  // Fetch order details
             fetch('/user/check_order_status.php?order_id=' + orderId)
                 .then(response => response.json())
                 .then(data => {
-                    if (data.status) {
+                    if (data.status != "Order is delivered") {
                         document.getElementById('order-status').innerText = data.status;
-                        updateMap(data.status)
+                        if (data.delivery_long && data.delivery_lat) {
+                            updateMap(data.status, data.delivery_long, data.delivery_lat);
+                        }
                     }
                     setTimeout(() => checkOrderStatus(orderId), 3000); // Check every 3 seconds
                 })
                 .catch(error => console.error('Error fetching order status:', error));
-        }
-
-        function updateMap(status) {
-            if (status === "Deliverer is on the way") {
-                changeDestination(<?= $order_lat ?>, <?= $order_long ?>);
-            }
         }
 
         function orderCollected(button) {
@@ -417,7 +358,6 @@ if ($row = $order->fetch_assoc()) {  // Fetch order details
                     console.log(data);
                 })
                 .catch(error => console.error("Error:", error));
-
         }
 
         function orderCompleted(button) {
@@ -432,7 +372,6 @@ if ($row = $order->fetch_assoc()) {  // Fetch order details
                 .then(data => {
                     console.log(data);
                     if (data.success) {
-                        alert("delivery completed");
                         // Display Completion Modal
                         deliveryComplete();
                     }
@@ -452,6 +391,7 @@ if ($row = $order->fetch_assoc()) {  // Fetch order details
         // Call the check order status function
         checkOrderStatus(<?= $order_id ?>);
 
+        window.onload = initMap;
     </script>
 </body>
 

@@ -132,7 +132,7 @@ $cancel_url = "https://www.foodfinder.shop/";
                     <!-- PayPal Settings -->
                     <input type="hidden" name="cmd" value="_xclick">
                     <input type="hidden" name="item_name" value="Food Order">
-                    <input type="hidden" name="amount" value="<?= $total_price ?>">
+                    <input type="hidden" name="amount" value="<?= $total_price + 1.99 ?>">
                     <input type="hidden" name="currency_code" value="SGD">
                     <input type="hidden" name="return" value="<?= $return_url ?>">
                     <input type="hidden" name="cancel_return" value="<?= $cancel_url ?>">

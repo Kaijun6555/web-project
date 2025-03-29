@@ -128,7 +128,6 @@ function getDeliveryRiderLocation() {
             let result = await response.json();
 
             if (result.message) {
-                alert("Location Saved Successfully!")
             }
             else {
                 alert("Something went wrong!");
