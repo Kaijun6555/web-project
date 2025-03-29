@@ -18,6 +18,7 @@ $query = "
     SIN(RADIANS(lat)))) AS distance
     FROM restaurant
     ORDER BY distance ASC";
+    
 
 $stmt = $conn->prepare($query);
 $stmt->bind_param("ddd", $user_lat, $user_lon, $user_lat);

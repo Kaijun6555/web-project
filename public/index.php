@@ -23,14 +23,14 @@
                                 placeholder="Type an Address" onfocus="getLocation()">
                             <br>
                             <button class="btn w-100 text-muted background-orange" type="submit">
-                                <strong>Confirm Location</strong>
+                                <strong>Search Restaurants</strong>
                             </button>
                         </div>
                     </div>
                 </div>
             </div>
             <div class="col-md-8">
-                <img src="/static/main-image2.png" class="mt-5" alt="hero image" width="100%">
+                <img src="/static/main-image2.png" class="mt-5 d-none d-md-block" alt="hero image" width="100%">
             </div>
         </div>
         <hr>
@@ -41,25 +41,26 @@
         <div class="row background-orange border rounded-4">
             <?php
             require '../db/db-connect.php';
-            $stmt = $conn->prepare("SELECT idrestaurant, name, address,image FROM restaurant ORDER BY name");
+            $stmt = $conn->prepare("SELECT idrestaurant, name, address, image FROM restaurant WHERE approval = 1 ORDER BY name");
             $stmt->execute();
             $result = $stmt->get_result();
             $stmt->close();
 
             while ($row = $result->fetch_assoc()):
                 ?>
-                <div class="col-md-3 mt-3 mb-3">
-                    <a class="text-decoration-none" href="/user/restaurant.php?id=<?= $row['idrestaurant'] ?>">
-                        <div class="card restaurant">
-                            <img src="<?= $row['image'] ?>" class="card-img-top" alt="store image">
-                            <div class="card-body">
-                                <h5 class="card-title"><?= htmlspecialchars($row['name']) ?></h5>
+                <div class="col-md-3 mt-3 mb-3 d-flex">
+                    <a class="text-decoration-none w-100" href="/user/restaurant.php?id=<?= $row['idrestaurant'] ?>">
+                        <div class="card restaurant h-100 d-flex flex-column">
+                            <img src="<?= $row['image'] ?>" class="card-img-top fixed-img" alt="store image">
+                            <div class="card-body d-flex flex-column">
+                                <h5 class="card-title flex-grow-1"><?= htmlspecialchars($row['name']) ?></h5>
                             </div>
                         </div>
                     </a>
                 </div>
             <?php endwhile; ?>
         </div>
+
     </main>
 
     <script>
@@ -75,6 +76,16 @@
             let latitude = position.coords.latitude;
             let longitude = position.coords.longitude;
             document.getElementById("location").value = latitude + ", " + longitude;
+            fetch('/requests/process_location.php', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded'
+                },
+                body: `latitude=${latitude}&longitude=${longitude}`
+            })
+                .then(response => response.text())
+                .then(data => console.log(data))
+                .catch(error => console.log(error));
         }
 
         function showError(error) {

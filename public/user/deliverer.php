@@ -69,7 +69,6 @@ $NEW_ORDER_STATUS = 1;
     </main>
 
     <?php include '../inc/footer.inc.php'; ?>
-
     <script>
         function getLocation() {
             if (navigator.geolocation) {
@@ -97,6 +96,7 @@ $NEW_ORDER_STATUS = 1;
         }
 
         getLocation();
+        changeButtonText('Deliverer');
     </script>
 </body>
 
