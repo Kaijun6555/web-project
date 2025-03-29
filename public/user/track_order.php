@@ -105,7 +105,6 @@ if (isset($_SESSION['cart']) && count($_SESSION['cart']) > 0) {
 
 ?>
 
-
 <!DOCTYPE html>
 <html lang="en">
 
@@ -210,7 +209,7 @@ if (isset($_SESSION['cart']) && count($_SESSION['cart']) > 0) {
             </div>
         </div>
     </div>
-    <script>
+    <script defer>
 
         // Update the Progress Bar
         let step = 1;
@@ -296,6 +295,7 @@ if (isset($_SESSION['cart']) && count($_SESSION['cart']) > 0) {
                     lat: parseFloat(delivery_lat),
                     lng: parseFloat(delivery_long)
                 };
+                
                 var end = { lat: <?= $restaurant['lat'] ?>, lng: <?= $restaurant['long'] ?> };
 
                 directionsService.route(

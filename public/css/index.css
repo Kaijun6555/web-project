@@ -1,0 +1,23 @@
+.restaurant:hover {
+    background-color: #E2E2E2;
+    transition: all 1s ease;
+}
+
+.fixed-img {
+    height: 180px;
+    object-fit: cover;
+}
+
+.card {
+    display: flex;
+    flex-direction: column;
+}
+
+.card-body {
+    flex-grow: 1;
+    /* Ensures equal height for all cards */
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    /* Pushes content down */
+}

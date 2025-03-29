@@ -1,9 +1,22 @@
+<?php
+require '../db/db-connect.php';
+session_start();
+
+// Check for location
+if (isset($_SESSION['user_location'])) {
+    $user_lat = $_SESSION['user_location']['lat'];
+    $user_lon = $_SESSION['user_location']['long'];
+    $user_address = $_SESSION['user_location']['address'];
+}
+?>
+
 <!DOCTYPE html>
 <html lang="en">
 
 <head>
     <title>Food</title>
     <?php include 'inc/head.inc.php'; ?>
+    <link rel="stylesheet" href="/css/index.css">
 </head>
 
 <body>
@@ -18,11 +31,12 @@
                         <h2 class="card-subtitle mb-2 text-muted">Where are you looking to deliver your food to?</h2>
                         <br>
                         <div class="form-group">
-                            <!-- <label for="location">Enter Location</label> -->
                             <input type="text" class="form-control" id="location" name="location"
-                                placeholder="Type an Address" onfocus="getLocation()">
+                                placeholder="Type an Address" onfocus="getUserLocation()" oninput="toggleSubmitButton()"
+                                <?php if (isset($_SESSION['user_location'])): ?> value="<?= $user_address ?>" <?php endif ?>>
                             <br>
-                            <button class="btn w-100 text-muted background-orange" type="submit">
+                            <button class="btn w-100 text-muted background-orange" id="location-button"
+                                onclick="sendToServer()">
                                 <strong>Search Restaurants</strong>
                             </button>
                         </div>
@@ -40,7 +54,6 @@
         </h2>
         <div class="row background-orange border rounded-4">
             <?php
-            require '../db/db-connect.php';
             $stmt = $conn->prepare("SELECT idrestaurant, name, address, image FROM restaurant WHERE approval = 1 ORDER BY name");
             $stmt->execute();
             $result = $stmt->get_result();
@@ -60,38 +73,14 @@
                 </div>
             <?php endwhile; ?>
         </div>
-
-    </main>
-
-    <script>
-        function getLocation() {
-            if (navigator.geolocation) {
-                navigator.geolocation.getCurrentPosition(sendPosition, showError);
+        <script>
+            if(document.getElementById("location").value){
+                document.getElementById("location-button").disabled = false;
             } else {
-                document.getElementById("output").innerText = "Geolocation is not supported by this browser.";
+                document.getElementById("location-button").disabled = true;
             }
-        }
-
-        function sendPosition(position) {
-            let latitude = position.coords.latitude;
-            let longitude = position.coords.longitude;
-            document.getElementById("location").value = latitude + ", " + longitude;
-            fetch('/requests/process_location.php', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/x-www-form-urlencoded'
-                },
-                body: `latitude=${latitude}&longitude=${longitude}`
-            })
-                .then(response => response.text())
-                .then(data => console.log(data))
-                .catch(error => console.log(error));
-        }
-
-        function showError(error) {
-            document.getElementById("location").value = "Can't Get Location";
-        }
-    </script>
+        </script>
+    </main>
 </body>
 
 </html>

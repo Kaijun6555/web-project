@@ -12,3 +12,5 @@
 <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
 <!-- Custom JS -->
 <script src="/js/main.js"></script>
+<!-- Location JS -->
+<script src="/js/location.js"></script>

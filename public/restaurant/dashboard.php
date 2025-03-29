@@ -1,12 +1,8 @@
 <?php
 $PREPARING_ORDER_STATUS = 2;
 
-$PREPARING_ORDER_STATUS = 2;
-
 require '../../db/db-connect.php';
 session_start();
-
-
 
 $id = $_SESSION['restaurant_id'];
 
@@ -30,10 +26,7 @@ $stmt->bind_param("i", $restaurant_id);
 $stmt->execute();
 $orders = $stmt->get_result();
 $stmt->close();
-
 ?>
-
-
 
 <!DOCTYPE html>
 <html lang="en">
@@ -76,6 +69,7 @@ $stmt->close();
                                                 </p>
                                                 <div>
                                                     <strong>Items:</strong>
+                                                    
                                                     <?php
                                                     $stmt = $conn->prepare("SELECT menu_item_id, quantity FROM Order_items WHERE order_id = ?");
                                                     $stmt->bind_param("i", $order['idOrders']);

@@ -26,7 +26,7 @@ if (!isset($_GET['order_id'])) {
 
 $order_id = $_GET['order_id'];
 
-// Prepare the SELECT statement to check the current status
+// Prepare the statement to check the current status
 $stmt = $conn->prepare("SELECT status FROM Orders WHERE idOrders = ?");
 $stmt->bind_param("i", $order_id);
 $stmt->execute();
@@ -42,6 +42,7 @@ if ($current_status == 1) {
     $stmt->close();
 }
 
+// Retrieve information about the order
 $stmt = $conn->prepare("SELECT idOrders, customer_user_id, order_address, restaurant_id, order_long, order_lat FROM Orders WHERE idOrders = ?");
 $stmt->bind_param("i", $order_id);
 $stmt->execute();
@@ -151,36 +152,9 @@ if ($row = $order->fetch_assoc()) {  // Fetch order details
         </div>
     </div>
 
-    <script>
 
-        // Handle the form submission
-        document.getElementById('paypalForm').addEventListener('submit', function (event) {
-            event.preventDefault();
+    <script defer>
 
-            var paypalEmail = document.getElementById('paypalEmail').value;
-
-            // Send the PayPal email and amount to the backend
-            fetch('/requests/process_payment.php', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
-                    paypalEmail: paypalEmail,
-                    amount: 1.99
-                })
-            })
-                .then(response => response.json())
-                .then(data => {
-                    alert(data.message);
-                    alert("Payment has been made to your email! Thank you for delivering with us.");
-                    window.location.href = "/";
-                })
-                .catch(error => {
-                    console.error('Error:', error);
-                    alert('Error occurred while sending payout');
-                });
-        });
 
         let map;
         let directionsService;
@@ -188,56 +162,6 @@ if ($row = $order->fetch_assoc()) {  // Fetch order details
         let userMarker;
         let watchId;
         let currentDestination;
-
-        // Request to constantly check order status. So if Restaurant has prepared order, user is notified
-        function checkOrderStatus(orderId) {
-            getLocation();
-            fetch('/user/check_order_status.php?order_id=' + orderId)
-                .then(response => response.json())
-                .then(data => {
-                    if (data.status) {
-                        document.getElementById('order-status').innerText = data.status;
-                        updateMap(data.status)
-                    }
-                    setTimeout(() => checkOrderStatus(orderId), 3000); // Check every 3 seconds
-                })
-                .catch(error => console.error('Error fetching order status:', error));
-        }
-
-        function updateMap(status) {
-            if (status === "Deliverer is on the way") {
-                changeDestination(<?= $order_lat ?>, <?= $order_long ?>);
-            }
-        }
-
-        function getLocation() {
-            if (navigator.geolocation) {
-                navigator.geolocation.getCurrentPosition(sendPosition, showError);
-            } else {
-                document.getElementById("output").innerText = "Geolocation is not supported by this browser.";
-            }
-        }
-
-        function sendPosition(position) {
-            let latitude = position.coords.latitude;
-            let longitude = position.coords.longitude;
-
-            // Store Delivery Rider's Current Location
-            fetch('/requests/process_deliverer_location.php', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/x-www-form-urlencoded'
-                },
-                body: `latitude=${latitude}&longitude=${longitude}&order_id=${<?= $order_id ?>}`
-            })
-                .then(response => response.text())
-                .then(data => console.log(data))
-                .catch(error => alert(error));
-        }
-
-        function showError(error) {
-            console.log("Can't get Location");
-        }
 
         function initMap() {
             // Initialize map with error handling and improved configuration
@@ -428,6 +352,57 @@ if ($row = $order->fetch_assoc()) {  // Fetch order details
                 watchId = null;
             }
         }
+        // Cleanup function for page unload or component destruction
+        window.addEventListener('unload', stopTracking);
+        // Handle the form submission
+        document.getElementById('paypalForm').addEventListener('submit', function (event) {
+            event.preventDefault();
+
+            var paypalEmail = document.getElementById('paypalEmail').value;
+
+            // Send the PayPal email and amount to the backend
+            fetch('/requests/process_payment.php', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    paypalEmail: paypalEmail,
+                    amount: 1.99
+                })
+            })
+                .then(response => response.json())
+                .then(data => {
+                    alert(data.message);
+                    alert("Payment has been made to your email! Thank you for delivering with us.");
+                    window.location.href = "/";
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('Error occurred while sending payout');
+                });
+        });
+
+        // Request to constantly check order status. So if Restaurant has prepared order, user is notified
+        function checkOrderStatus(orderId) {
+            SaveDeliveryRiderLocation(orderId);
+            fetch('/user/check_order_status.php?order_id=' + orderId)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.status) {
+                        document.getElementById('order-status').innerText = data.status;
+                        updateMap(data.status)
+                    }
+                    setTimeout(() => checkOrderStatus(orderId), 3000); // Check every 3 seconds
+                })
+                .catch(error => console.error('Error fetching order status:', error));
+        }
+
+        function updateMap(status) {
+            if (status === "Deliverer is on the way") {
+                changeDestination(<?= $order_lat ?>, <?= $order_long ?>);
+            }
+        }
 
         function orderCollected(button) {
             fetch('/requests/process_order_pickup.php', {
@@ -465,7 +440,7 @@ if ($row = $order->fetch_assoc()) {  // Fetch order details
                 })
                 .catch(error => console.error("Error:", error));
         }
-        
+
         function deliveryComplete() {
             setTimeout(() => {
                 // Display pop up after 3 seconds.
@@ -476,9 +451,6 @@ if ($row = $order->fetch_assoc()) {  // Fetch order details
 
         // Call the check order status function
         checkOrderStatus(<?= $order_id ?>);
-
-        // Cleanup function for page unload or component destruction
-        window.addEventListener('unload', stopTracking);
 
     </script>
 </body>

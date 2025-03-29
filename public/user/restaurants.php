@@ -1,13 +1,11 @@
 <?php
 require '../../db/db-connect.php';
+session_start();
 
-// Get user's IP-based location using `ip-api.com`
-$user_lat = 0;
-$user_lon = 0;
-$ip_data = @json_decode(file_get_contents("http://ip-api.com/json/?fields=lat,lon"), true);
-if ($ip_data && isset($ip_data['lat']) && isset($ip_data['lon'])) {
-    $user_lat = $ip_data['lat'];
-    $user_lon = $ip_data['lon'];
+if (isset($_SESSION['user_location'])) {
+    $user_lat = $_SESSION['user_location']['lat'];
+    $user_lon = $_SESSION['user_location']['long'];
+    $user_address = $_SESSION['user_location']['address'];
 }
 
 // Query to get restaurants sorted by nearest distance
@@ -18,7 +16,7 @@ $query = "
     SIN(RADIANS(lat)))) AS distance
     FROM restaurant
     ORDER BY distance ASC";
-    
+
 
 $stmt = $conn->prepare($query);
 $stmt->bind_param("ddd", $user_lat, $user_lon, $user_lat);
@@ -41,7 +39,7 @@ $result = $stmt->get_result();
         <ul class="list-group">
             <?php while ($row = $result->fetch_assoc()): ?>
                 <li class="list-group-item">
-                    <a href="/user/restaurant.php?id=<?= htmlspecialchars($row['id']) ?>">
+                    <a href="/user/restaurant.php?id=<?= htmlspecialchars($row['idrestaurant']) ?>">
                         <?= htmlspecialchars($row['name']) ?> - <?= number_format($row['distance'], 2) ?> km away
                     </a>
                 </li>
@@ -50,6 +48,8 @@ $result = $stmt->get_result();
     </div>
 
     <?php include '../inc/footer.inc.php'; ?>
+    <script>
+    </script>
 </body>
 
 </html>

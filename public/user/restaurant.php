@@ -9,6 +9,13 @@ if ($id <= 0) {
     die("Invalid restaurant ID.");
 }
 
+// Check for location
+if (isset($_SESSION['user_location'])) {
+    $user_lat = $_SESSION['user_location']['lat'];
+    $user_lon = $_SESSION['user_location']['long'];
+    $user_address = $_SESSION['user_location']['address'];
+}
+
 // Fetch restaurant details
 $stmt = $conn->prepare("SELECT name, address FROM restaurant WHERE idrestaurant = ?");
 $stmt->bind_param("i", $id);
@@ -34,6 +41,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST["menu_id"])) {
     $menu_name = $_POST["menu_name"];
     $menu_price = (float) $_POST["menu_price"];
     $restaurant_id = (int) $_POST["restaurant_id"];
+    $menu_image = $_POST["menu_image"];
+
 
     if (!isset($_SESSION['cart'])) {
         $_SESSION['cart'] = [];
@@ -45,7 +54,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST["menu_id"])) {
         'restaurant_id' => $id,
         'name' => $menu_name,
         'price' => $menu_price,
-        'quantity' => 1
+        'quantity' => 1,
+        'image' => $menu_image
     ];
 
     header("Location: /user/restaurant.php?id=$id&cart_success=1");
@@ -63,7 +73,21 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST["menu_id"])) {
 <body>
     <?php include '../inc/nav.inc.php'; ?>
     <div class="container mt-4">
+        <div class="row">
+            <div class="col-md-4">
+                <input type="text" class="form-control" id="location" name="location" placeholder="Type an Address"
+                    onfocus="getUserLocation()" oninput="toggleSubmitButton()" value="<?= $user_address ?>">
+            </div>
+            <div class="col-md-2">
+                <button class="btn text-muted background-orange" id="location-button" onclick="saveLocation()" disabled>
+                    <strong>Confirm Address</strong>
+                </button>
+            </div>
+        </div>
 
+        <br>
+
+        <!-- Navigation -->
         <p>
             <a href="/">Home</a>
             <i class="bi bi-arrow-right-short"></i>
@@ -83,7 +107,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST["menu_id"])) {
             <div class="row card-deck">
                 <?php while ($menu_item = $menu_result->fetch_assoc()): ?>
                     <div class="card col-md-4">
-                        <img class="card-img-top" src="<?= htmlspecialchars($menu_item['image']) ?>" alt="Card image cap">
+                        <img class="card-img-top" src="<?= htmlspecialchars($menu_item['image']) ?>" alt="Image of menu item">
                         <div class="card-body">
                             <h5 class="card-title"><?= htmlspecialchars($menu_item['itemName']) ?></h5>
                             <p class="card-text"><?= nl2br(htmlspecialchars($menu_item['description'])) ?></p>
@@ -127,6 +151,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST["menu_id"])) {
                             <!-- Add to Cart Form -->
                             <form method="POST" class="d-inline">
                                 <input type="hidden" name="menu_id" value="<?= $menu_item['idmenu_item'] ?>">
+                                <input type="hidden" name="menu_image" value="<?= $menu_item['image'] ?>">
                                 <input type="hidden" name="menu_name" value="<?= htmlspecialchars($menu_item['itemName']) ?>">
                                 <input type="hidden" name="menu_price" value="<?= $menu_item['price'] ?>">
                                 <input type="hidden" name="restaurant_id" value="<?= $menu_item['restaurant_id'] ?>">

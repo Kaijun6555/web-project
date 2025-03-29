@@ -13,6 +13,7 @@ if (isset($_POST['latitude']) && isset($_POST['longitude']) && isset($_POST['ord
     $stmt->bind_param("ddi", $longitude, $latitude, $order_id);
     $stmt->execute();
     $stmt->close();
+    echo "Location updated successfully to $longitude, $latitude";
     
 } else {
     echo "Error: No location data received!";

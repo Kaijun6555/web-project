@@ -1,4 +1,5 @@
 <?php
+require '../../db/db-connect.php';
 session_start();
 
 if (empty($_SESSION['user_id'])) {
@@ -22,11 +23,10 @@ $NEW_ORDER_STATUS = 1;
     <?php include '../inc/nav.inc.php'; ?>
 
     <main class="container mt-4">
-        <h2>Deliver Requests</h2>
+        <h2>Delivery Requests</h2>
+
         <div class="row">
             <?php
-            require '../../db/db-connect.php';
-
             $stmt = $conn->prepare("SELECT idOrders, customer_user_id, order_address, restaurant_id FROM Orders WHERE status=?");
             $stmt->bind_param("i", $NEW_ORDER_STATUS);
             $stmt->execute();
@@ -51,16 +51,18 @@ $NEW_ORDER_STATUS = 1;
                             <div class="card-body">
                                 <p class="mb-1"><i class="fa fa-user"></i> <strong>Scarlet Johansson</strong></p>
                                 <p class="mb-1"><i class="bi-circle"></i>&nbsp;<?= $restaurant_address ?></p>
-                                <p><i class="bi bi-geo-alt"></i>&nbsp;<?=$row['order_address']?></p>
+                                <p><i class="bi bi-geo-alt"></i>&nbsp;<?= $row['order_address'] ?></p>
                             </div>
                             <div class="card-footer d-flex justify-content-between align-items-center bg-light">
                                 <span class="text-muted"><i class="bi bi-wallet"></i>&nbsp;SGD$ 1.99</span>
-                                <button class="btn btn-success btn-sm"><a href="/user/deliverer_order_track.php?order_id=<?=$row['idOrders']?>">Accept Order</a></button>
+                                <button class="btn btn-success btn-sm"><a
+                                        href="/user/deliverer_order_track.php?order_id=<?= $row['idOrders'] ?>">Accept
+                                        Order</a></button>
                             </div>
                         </div>
                     </div>
-                    <?php endwhile;?> 
-                    <?php else: ?>
+                <?php endwhile; ?>
+            <?php else: ?>
                 <div class="col-12">
                     <p class="text-center text-muted">There are no orders currently available.</p>
                 </div>
@@ -70,32 +72,7 @@ $NEW_ORDER_STATUS = 1;
 
     <?php include '../inc/footer.inc.php'; ?>
     <script>
-        function getLocation() {
-            if (navigator.geolocation) {
-                navigator.geolocation.getCurrentPosition(sendPosition, showError);
-            }
-        }
-
-        function sendPosition(position) {
-            let latitude = position.coords.latitude;
-            let longitude = position.coords.longitude;
-            fetch('/requests/process_location.php', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/x-www-form-urlencoded'
-                },
-                body: `latitude=${latitude}&longitude=${longitude}`
-            })
-                .then(response => response.text())
-                .then(data => alert(data))
-                .catch(error => alert(error));
-        }
-
-        function showError(error) {
-            alert(error);
-        }
-
-        getLocation();
+        getDeliveryRiderLocation();
         changeButtonText('Deliverer');
     </script>
 </body>
