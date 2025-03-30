@@ -116,7 +116,7 @@ if ($row = $order->fetch_assoc()) {  // Fetch order details
                                     <label for="paypalEmail">Enter PayPal Email:</label>
                                     <input type="email" id="paypalEmail" name="paypalEmail" required />
                                     <br><br>
-                                    <button type="submit" class="btn btn-success">Send Payout</button>
+                                    <button type="submit" class="btn btn-success">Confirm Email</button>
                                 </form>
 
 
@@ -137,7 +137,7 @@ if ($row = $order->fetch_assoc()) {  // Fetch order details
                                 <div class="mt-3">
                                     <div class="d-flex justify-content-between text-danger">
                                         <span>Delivery Fee</span>
-                                        <strong>1.99</strong>
+                                        <strong>$1.99</strong>
                                     </div>
                                     <hr>
                                     <div class="d-flex justify-content-between text-success">
@@ -157,7 +157,7 @@ if ($row = $order->fetch_assoc()) {  // Fetch order details
     <script defer>
 
         // Map Variables
-        let map, marker, directionsService, directionsRenderer;
+        let map, marker, directionsService, directionsRenderer, startMarker, endMarker;
 
         function initMap() {
             map = new google.maps.Map(document.getElementById('map'), {
@@ -193,7 +193,6 @@ if ($row = $order->fetch_assoc()) {  // Fetch order details
         function updateMap(status, delivery_long, delivery_lat) {
             if ((status === "Order is being Prepared" || status === "Rider Pickup")) {
 
-                // Resetting the map.
                 marker.setMap(null);
                 directionsRenderer.setMap(map);
 
@@ -215,7 +214,7 @@ if ($row = $order->fetch_assoc()) {  // Fetch order details
                         if (status === "OK") {
                             directionsRenderer.setDirections(response);
                             // Set marker at the delivery rider's location with start icon
-                            var startMarker = new google.maps.Marker({
+                            startMarker = new google.maps.Marker({
                                 position: start,
                                 map: map,
                                 icon: {
@@ -226,7 +225,7 @@ if ($row = $order->fetch_assoc()) {  // Fetch order details
                             });
 
                             // Set marker at the restaurant's location with end icon
-                            var endMarker = new google.maps.Marker({
+                            endMarker = new google.maps.Marker({
                                 position: end,
                                 map: map,
                                 icon: {

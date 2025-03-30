@@ -4,7 +4,25 @@ $PREPARING_ORDER_STATUS = 2;
 require '../../db/db-connect.php';
 session_start();
 
+//Redirect misusers to login page if they tries to access merchant dashboard page
+if (!$_SESSION['restaurant_id'] == null) {
+    $restaurant_id = $_SESSION['restaurant_id'];
+} else {
+    header('Location: /restaurant/restaurant_login.php');
+}
+
 $id = $_SESSION['restaurant_id'];
+
+// Get restaurant details
+$stmt = $conn->prepare("SELECT paypal_email FROM restaurant WHERE idrestaurant = ?");
+$stmt->bind_param("i", $id);
+$stmt->execute();
+$result = $stmt->get_result();
+$restaurant = $result->fetch_assoc();
+$stmt->close();
+
+// Retrieve value for paypal email
+$restaurant_paypal_email = $restaurant['paypal_email'];
 
 // Fetch all orders for restaurant
 $stmt = $conn->prepare("SELECT idOrders, total_price, created_at FROM Orders WHERE restaurant_id = ? AND status = ? ORDER BY created_at");
@@ -13,18 +31,10 @@ $stmt->execute();
 $orders = $stmt->get_result();
 $stmt->close();
 
-//Redirect misusers to login page if they tries to access merchant dashboard page
-if (!$_SESSION['restaurant_id'] == null) {
-    $restaurant_id = $_SESSION['restaurant_id'];
-}
-else {
-    header('Location: /restaurant/restaurant_login.php');
-}
-
-$stmt = $conn->prepare("SELECT idmenu_item, itemName, price, availability, description, image FROM menu_item WHERE restaurant_id = ? ORDER BY itemName") ;
+$stmt = $conn->prepare("SELECT idmenu_item, itemName, price, availability, description, image FROM menu_item WHERE restaurant_id = ? ORDER BY itemName");
 $stmt->bind_param("i", $restaurant_id);
 $stmt->execute();
-$orders = $stmt->get_result();
+$menu_items = $stmt->get_result();
 $stmt->close();
 ?>
 
@@ -56,7 +66,7 @@ $stmt->close();
                                                 <?= $order['idOrders'] ?>
                                                 <span class="badge bg-warning text-dark ms-2">Pending</span>
                                                 <button class="btn btn-success"
-                                                    onclick="completeOrder(<?= $order['idOrders'] ?>, this)">Order
+                                                    onclick="completeOrder(<?= $order['idOrders'] ?>, <?=$order['total_price']?>, this)">Order
                                                     Completed</button>
                                             </button>
                                         </h2>
@@ -69,7 +79,7 @@ $stmt->close();
                                                 </p>
                                                 <div>
                                                     <strong>Items:</strong>
-                                                    
+
                                                     <?php
                                                     $stmt = $conn->prepare("SELECT menu_item_id, quantity FROM Order_items WHERE order_id = ?");
                                                     $stmt->bind_param("i", $order['idOrders']);
@@ -122,7 +132,8 @@ $stmt->close();
     </div>
 
     <script>
-        function completeOrder(orderId, button) {
+        function completeOrder(orderId, total_price, button) {
+            // Update Order Status
             fetch('/requests/process_complete_order.php', {
                 method: 'POST',
                 headers: {
@@ -133,6 +144,28 @@ $stmt->close();
                 .then(response => response.json())
                 .then(data => {
                     if (data.success) {
+                        // Once updated, Pay Merchant
+                        var paypalEmail = "<?= $restaurant_paypal_email ?>";
+                        // Send the PayPal email and amount to the backend
+                        fetch('/requests/process_payment.php', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                            },
+                            body: JSON.stringify({
+                                paypalEmail: paypalEmail,
+                                amount: total_price
+                            })
+                        })
+                            .then(response => response.json())
+                            .then(data => {
+                                alert("Payment has been made to your Business Account");
+                            })
+                            .catch(error => {
+                                console.error('Error:', error);
+                                alert('Error occurred while sending payout');
+                            });
+
                         let accordionItem = button.closest(".accordion-item");
                         if (accordionItem) {
                             accordionItem.remove();
@@ -143,6 +176,8 @@ $stmt->close();
                 })
                 .catch(error => console.error("Error:", error));
         }
+
+
     </script>
 </body>
 

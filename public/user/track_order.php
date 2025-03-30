@@ -3,9 +3,6 @@
 $google_api_key = "AIzaSyDBM2Uks3o02p1Vx9PAntKYvb-smBVzhCI";
 $NEW_ORDER_STATUS = 1;
 $restaurant_id = 0;
-
-// find API to Change value according to long lat
-$order_address = "SIT Ho Bee Auditorium, 1 Punggol Coast Road";
 ?>
 
 <!-- Send out deliver requests by storing order -->
@@ -27,6 +24,8 @@ $total_price = 0;
 // Order long and lat
 $order_long = $user_long;
 $order_lat = $user_lat;
+
+$order_address = $_SESSION['user_location']['address'];
 
 if (isset($_SESSION['cart']) && count($_SESSION['cart']) > 0) {
 
@@ -184,19 +183,19 @@ if (isset($_SESSION['cart']) && count($_SESSION['cart']) > 0) {
                             <?php foreach ($orderDetails as $order_item): ?>
                                 <div class="d-flex justify-content-between">
                                     <span><?= $order_item['quantity'] ?> X <?= $order_item['name'] ?></span>
-                                    <strong>9.9</strong>
+                                    <strong>$<?= $order_item['price'] * $order_item['quantity'] ?></strong>
                                 </div>
                             <?php endforeach; ?>
                             <hr>
                             <div class="d-flex justify-content-between text-success"><strong>Food Cost</strong>
-                                <strong><?= $total_price ?></strong>
+                                <strong>$<?= $total_price ?></strong>
                             </div>
                         </div>
 
                         <div class="mt-3">
                             <div class="d-flex justify-content-between text-danger">
                                 <span>Delivery Fee</span>
-                                <strong>1.99</strong>
+                                <strong>$1.99</strong>
                             </div>
                             <hr>
                             <div class="d-flex justify-content-between text-success">
