@@ -97,8 +97,8 @@ if ($row = $order->fetch_assoc()) {  // Fetch order details
             </div>
             <div class="col-md-6">
                 <h3>Order Status: <strong><span id="order-status">Order is being Prepared</span></strong></h3>
-                <button class="btn btn-success" onclick="orderCollected(this)">Order Collected from Restaurant</button>
-                <button class="btn btn-success" onclick="orderCompleted(this)">Order Completed</button>
+                <button class="btn btn-success" id="order_collected_button" onclick="orderCollected()" disabled>Order Collected from Restaurant</button>
+                <button class="btn btn-success" id="order_completed_button" onclick="orderCompleted()" disabled>Order Completed</button>
             </div>
             <!-- Order Completed Modal -->
             <div class="modal fade" id="orderCompleted" tabindex="-1" aria-labelledby="modalTitle" aria-hidden="true">
@@ -178,7 +178,6 @@ if ($row = $order->fetch_assoc()) {  // Fetch order details
                 ],
             });
 
-
             // Add the "Looking for a deliverer" marker
             marker = new google.maps.Marker({
                 position: { lat: <?= $user_lat ?>, lng: <?= $user_long ?> }, // Starting point
@@ -193,8 +192,13 @@ if ($row = $order->fetch_assoc()) {  // Fetch order details
         function updateMap(status, delivery_long, delivery_lat) {
             if ((status === "Order is being Prepared" || status === "Rider Pickup")) {
 
+                if(status === "Rider Pickup"){
+                    document.getElementById('order_collected_button').disabled = false;
+                }
+
                 marker.setMap(null);
                 directionsRenderer.setMap(map);
+                
 
                 // Delivery Rider Live Location
                 var start = {
@@ -243,6 +247,9 @@ if ($row = $order->fetch_assoc()) {  // Fetch order details
 
 
             else if (status === "Rider is on the way") {
+
+                document.getElementById('order_collected_button').disabled = true;
+                document.getElementById('order_completed_button').disabled = false
 
                 // Order on the way
                 marker.setMap(null);

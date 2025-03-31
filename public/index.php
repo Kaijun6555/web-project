@@ -2,6 +2,7 @@
 require '../db/db-connect.php';
 session_start();
 
+
 // Check for location
 if (isset($_SESSION['user_location'])) {
     $user_lat = $_SESSION['user_location']['lat'];
@@ -34,20 +35,29 @@ if (isset($_SESSION['payerUrl']) && !empty($_SESSION['payerUrl'])) {
 ?>
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <title>Food</title>
     <?php include 'inc/head.inc.php'; ?>
     <link rel="stylesheet" href="/css/index.css">
 </head>
+
 <body>
     <?php include 'inc/nav.inc.php'; ?>
     <main class="container">
+        
         <!-- Display Resume Tracking Button if an incomplete order exists -->
         <?php if ($trackingOrderId): ?>
+            <br>
             <div class="alert alert-info mt-3">
                 You have an ongoing order.
                 <a href="<?= htmlspecialchars($trackingUrl) ?>" class="btn btn-warning ms-2">Resume Tracking</a>
             </div>
+        <?php endif; ?>
+
+
+        <?php if (isset($_GET['require_login'])): ?>
+            <div class="alert alert-danger">Please Log In to Continue</div>
         <?php endif; ?>
 
         <!-- Enter Location -->
@@ -61,7 +71,15 @@ if (isset($_SESSION['payerUrl']) && !empty($_SESSION['payerUrl'])) {
                         <div class="form-group">
                             <input type="text" class="form-control" id="location" name="location"
                                 placeholder="Type an Address" onfocus="getUserLocation()" oninput="toggleSubmitButton()"
-                                <?php if (isset($_SESSION['user_location'])): ?> value="<?= htmlspecialchars($user_address) ?>" <?php endif; ?>>
+                                <?php if (isset($_SESSION['user_location'])): ?>
+                                    value="<?= htmlspecialchars($user_address) ?>" <?php endif; ?>>
+                            <br>
+                            <!-- Warn user to enter location first -->
+                            <?php if (isset($_GET['require_location'])): ?>
+                                <div class="alert alert-danger">
+                                    Please enter a location first
+                                </div>
+                            <?php endif; ?>
                             <br>
                             <button class="btn w-100 text-muted background-orange" id="location-button"
                                 onclick="sendToServer()">
@@ -91,7 +109,8 @@ if (isset($_SESSION['payerUrl']) && !empty($_SESSION['payerUrl'])) {
                 <div class="col-md-3 mt-3 mb-3 d-flex">
                     <a class="text-decoration-none w-100" href="/user/restaurant.php?id=<?= $row['idrestaurant'] ?>">
                         <div class="card restaurant h-100 d-flex flex-column">
-                            <img src="<?= htmlspecialchars($row['image']) ?>" class="card-img-top fixed-img" alt="store image">
+                            <img src="<?= htmlspecialchars($row['image']) ?>" class="card-img-top fixed-img"
+                                alt="store image">
                             <div class="card-body d-flex flex-column">
                                 <h5 class="card-title flex-grow-1"><?= htmlspecialchars($row['name']) ?></h5>
                             </div>
@@ -102,7 +121,7 @@ if (isset($_SESSION['payerUrl']) && !empty($_SESSION['payerUrl'])) {
         </div>
         <script>
             // Enable or disable the location button based on input value
-            if(document.getElementById("location").value){
+            if (document.getElementById("location").value) {
                 document.getElementById("location-button").disabled = false;
             } else {
                 document.getElementById("location-button").disabled = true;
@@ -110,4 +129,5 @@ if (isset($_SESSION['payerUrl']) && !empty($_SESSION['payerUrl'])) {
         </script>
     </main>
 </body>
+
 </html>

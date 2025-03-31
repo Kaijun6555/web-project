@@ -117,7 +117,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST["remove_id"])) {
                     <?php endforeach; ?>
                 </tbody>
             </table>
-            <?php // Calculate total price
+            <?php 
+                // Calculate total price
                 $total_price = 0;
                 if (isset($_SESSION['cart']) && count($_SESSION['cart']) > 0) {
                     foreach ($_SESSION['cart'] as $item) {

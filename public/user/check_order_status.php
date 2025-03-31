@@ -30,7 +30,8 @@ if (isset($_GET['order_id'])) {
         echo json_encode([
             "status" => $status,
             "delivery_long" => $row['delivery_long'],
-            "delivery_lat" => $row['delivery_lat']
+            "delivery_lat" => $row['delivery_lat'],
+            "step" => $row['status']
         ]);
     } else {
         echo json_encode(["status" => "Not Found"]);

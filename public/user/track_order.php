@@ -1,51 +1,57 @@
 <?php
+require '../../db/db-connect.php';
+session_start();
 
 $google_api_key = "AIzaSyDBM2Uks3o02p1Vx9PAntKYvb-smBVzhCI";
 $NEW_ORDER_STATUS = 1;
 $restaurant_id = 0;
-?>
-
-<!-- Send out deliver requests by storing order -->
-<?php
-require '../../db/db-connect.php';
-session_start();
+$total_price = 0;
 
 // Retreieve Order Location
 if (isset($_SESSION['user_location'])) {
     $user_lat = $_SESSION['user_location']['lat'];
     $user_long = $_SESSION['user_location']['long'];
+    $user_address = $_SESSION['user_location']['address'];
 } else {
     echo "No location saved yet.";
 }
 
-// Total price of order
-$total_price = 0;
+if (isset($_SESSION['user_id'])) {
+    $user_id = $_SESSION['user_id'];
+    // Fetch whether order_ongoing
+    $stmt = $conn->prepare("SELECT order_ongoing FROM Users WHERE idUsers = ?");
+    $stmt->bind_param("i", $user_id);
+    $stmt->execute();
+    $result = $stmt->get_result();
+    $user = $result->fetch_assoc();
+    $stmt->close();
+} else {
+    header("Location: /");
+    exit();
+}
 
-// Order long and lat
-$order_long = $user_long;
-$order_lat = $user_lat;
+// If just checked out from cart, INSERT new Order items
+if (isset($_SESSION['cart']) && count($_SESSION['cart']) > 0 && $user['order_ongoing'] == 1) {
 
-$order_address = $_SESSION['user_location']['address'];
+    if (isset($_SESSION['order'])) {
 
-if (isset($_SESSION['cart']) && count($_SESSION['cart']) > 0) {
+        unset($_SESSION['order']);
+    }
 
-    // Compute total
+    // Assign variables for order long and lat
+    $order_long = $user_long;
+    $order_lat = $user_lat;
+    $order_address = $user_address;
+
+    // Compute Total and retrieve restaurant ID
     foreach ($_SESSION['cart'] as $item) {
         $restaurant_id = $item['restaurant_id'];
         $total_price += $item['price'] * $item['quantity'];
     }
 
-    // Fetch restaurant long and lat
-    $stmt = $conn->prepare("SELECT `long`, lat, name FROM restaurant WHERE idrestaurant = ?");
-    $stmt->bind_param("i", $restaurant_id);
-    $stmt->execute();
-    $result = $stmt->get_result();
-    $restaurant = $result->fetch_assoc();
-    $stmt->close();
-
     // Insert order
     $stmt = $conn->prepare("INSERT INTO Orders (customer_user_id, total_price, restaurant_id, status, order_long, order_lat, order_address) VALUES (?, ?, ?, ?, ?, ?, ?)");
-    $customer_user_id = $_SESSION['user_id'];
+    $customer_user_id = $user_id;
     $stmt->bind_param(
         "idiidds",
         $customer_user_id,
@@ -68,39 +74,60 @@ if (isset($_SESSION['cart']) && count($_SESSION['cart']) > 0) {
     }
     $stmt->close();
 
+    // Store in session
+    $_SESSION['order'][] = [
+        "order_id" => $order_id,
+        "restaurant_id" => $restaurant_id,
+        'total_price' => $total_price,
+    ];
+
     // Clear cart session
     unset($_SESSION['cart']);
-
-    $stmt = $conn->prepare("SELECT menu_item_id, quantity FROM Order_items WHERE order_id = ?");
-    $stmt->bind_param("i", $order_id);
-    $stmt->execute();
-    $items = $stmt->get_result();
-    $stmt->close();
-
-    // Array to store order details
-    $orderDetails = [];
-
-    while ($item = $items->fetch_assoc()) {
-        $menu_item_id = $item['menu_item_id'];
-        $quantity = $item['quantity'];
-
-        // Retrieve menu details using menu_item_id
-        $stmt = $conn->prepare("SELECT itemName FROM menu_item WHERE idmenu_item = ?");
-        $stmt->bind_param("i", $menu_item_id);
-        $stmt->execute();
-        $menu_result = $stmt->get_result();
-
-        if ($menu = $menu_result->fetch_assoc()) {
-            $orderDetails[] = [
-                'name' => $menu['itemName'],
-                'quantity' => $quantity
-            ];
-        }
-        $stmt->close();
-    }
-
 }
 
+if (isset($_SESSION['order'])) {
+    $order_id = $_SESSION['order'][0]['order_id'];
+    $restaurant_id = $_SESSION['order'][0]['restaurant_id'];
+    $total_price = $_SESSION['order'][0]['total_price'];
+}
+
+// Fetch restaurant long and lat
+$stmt = $conn->prepare("SELECT `long`, lat, name FROM restaurant WHERE idrestaurant = ?");
+$stmt->bind_param("i", $restaurant_id);
+$stmt->execute();
+$result = $stmt->get_result();
+$restaurant = $result->fetch_assoc();
+$stmt->close();
+
+// Array to store order details
+$orderDetails = [];
+
+// Retrieve Details of Order
+$stmt = $conn->prepare("SELECT menu_item_id, quantity FROM Order_items WHERE order_id = ?");
+$stmt->bind_param("i", $order_id);
+$stmt->execute();
+$items = $stmt->get_result();
+$stmt->close();
+
+while ($item = $items->fetch_assoc()) {
+    $menu_item_id = $item['menu_item_id'];
+    $quantity = $item['quantity'];
+
+    // Retrieve menu details
+    $stmt = $conn->prepare("SELECT itemName, price FROM menu_item WHERE idmenu_item = ?");
+    $stmt->bind_param("i", $menu_item_id);
+    $stmt->execute();
+    $menu_result = $stmt->get_result();
+
+    if ($menu = $menu_result->fetch_assoc()) {
+        $orderDetails[] = [
+            'name' => $menu['itemName'],
+            'quantity' => $quantity,
+            'price' => $menu['price']
+        ];
+    }
+    $stmt->close();
+}
 ?>
 
 <!DOCTYPE html>
@@ -109,8 +136,7 @@ if (isset($_SESSION['cart']) && count($_SESSION['cart']) > 0) {
 <head>
     <title>Track Order</title>
     <?php include '../inc/head.inc.php'; ?>
-    <script src="https://maps.googleapis.com/maps/api/js?key=<?= $google_api_key ?>&callback=initMap" async
-        defer></script>
+    <script src="https://maps.googleapis.com/maps/api/js?key=<?= $google_api_key ?>&libraries=places" async></script>
 
 </head>
 
@@ -183,12 +209,12 @@ if (isset($_SESSION['cart']) && count($_SESSION['cart']) > 0) {
                             <?php foreach ($orderDetails as $order_item): ?>
                                 <div class="d-flex justify-content-between">
                                     <span><?= $order_item['quantity'] ?> X <?= $order_item['name'] ?></span>
-                                    <strong>$<?= $order_item['price'] * $order_item['quantity'] ?></strong>
+                                    <strong>$<?= number_format($order_item['price'] * $order_item['quantity'], 2) ?></strong>
                                 </div>
                             <?php endforeach; ?>
                             <hr>
                             <div class="d-flex justify-content-between text-success"><strong>Food Cost</strong>
-                                <strong>$<?= $total_price ?></strong>
+                                <strong>$<?= number_format($total_price, 2) ?></strong>
                             </div>
                         </div>
 
@@ -200,7 +226,7 @@ if (isset($_SESSION['cart']) && count($_SESSION['cart']) > 0) {
                             <hr>
                             <div class="d-flex justify-content-between text-success">
                                 <strong>Total</strong>
-                                <strong>$<?= $total_price + 1.99 ?></strong>
+                                <strong>$<?= number_format($total_price + 1.99, 2) ?></strong>
                             </div>
                         </div>
                     </div>
@@ -209,12 +235,11 @@ if (isset($_SESSION['cart']) && count($_SESSION['cart']) > 0) {
         </div>
     </div>
     <script defer>
-
         // Update the Progress Bar
         let step = 1;
+
         function updateProgress() {
-            if (step < 5) {
-                step++;
+            if (step <= 5) {
                 document.getElementById("progress-bar").style.width = (step * 20) + "%";
 
                 for (let i = 1; i <= step; i++) {
@@ -251,7 +276,7 @@ if (isset($_SESSION['cart']) && count($_SESSION['cart']) > 0) {
             marker = new google.maps.Marker({
                 position: { lat: <?= $user_lat ?>, lng: <?= $user_long ?> }, // Starting point
                 map: map,
-                icon: '/static/searching-loading.gif', // You can use an animated icon for this state
+                icon: '/static/searching-loading.gif',
                 title: "Looking for a deliverer"
             });
 
@@ -268,7 +293,7 @@ if (isset($_SESSION['cart']) && count($_SESSION['cart']) > 0) {
                     if (data.status) {
                         document.getElementById('order-status').innerText = data.status;
                         if (data.delivery_long && data.delivery_lat) {
-                            updateMap(data.status, data.delivery_long, data.delivery_lat);
+                            updateMap(data.status, data.delivery_long, data.delivery_lat, data.step);
                         }
                     }
                     setTimeout(() => checkOrderStatus(orderId), 3000);
@@ -276,14 +301,18 @@ if (isset($_SESSION['cart']) && count($_SESSION['cart']) > 0) {
                 .catch(error => console.error('Error fetching order status:', error));
         }
 
-        function updateMap(status, delivery_long, delivery_lat) {
+        function updateMap(status, delivery_long, delivery_lat, stored_step) {
+           
+            // Handle Progress Bar
+            if (step === 1) {
+                step = stored_step;
+                updateProgress();
+            }
+            
             if ((status === "Order is being Prepared" || status === "Rider Pickup")) {
 
-                // Handle Progress Bar
-                if (step === 1) {
-                    updateProgress();
-                }
                 if (status === "Rider Pickup" && step === 2) {
+                    step+=1;
                     updateProgress();
                 }
 
@@ -298,8 +327,6 @@ if (isset($_SESSION['cart']) && count($_SESSION['cart']) > 0) {
                 };
 
                 var end = { lat: <?= $restaurant['lat'] ?>, lng: <?= $restaurant['long'] ?> };
-
-
 
                 directionsService.route(
                     {
@@ -341,6 +368,7 @@ if (isset($_SESSION['cart']) && count($_SESSION['cart']) > 0) {
             else if (status === "Rider is on the way") {
 
                 if (step === 3) {
+                    step += 1;
                     updateProgress();
                 }
 
@@ -363,7 +391,7 @@ if (isset($_SESSION['cart']) && count($_SESSION['cart']) > 0) {
                 ?>
 
                 // Location of customer
-                var end = { lat: <?= $order_lat ?>, lng: <?= $order_long ?> };
+                var end = { lat: <?= $user_lat ?>, lng: <?= $user_long ?> };
 
                 directionsService.route(
                     {
@@ -403,6 +431,7 @@ if (isset($_SESSION['cart']) && count($_SESSION['cart']) > 0) {
             }
             else if (status === "Order is delivered") {
                 if (step === 4) {
+                    step += 1;
                     updateProgress();
                     deliveryComplete();
                     return
@@ -420,6 +449,7 @@ if (isset($_SESSION['cart']) && count($_SESSION['cart']) > 0) {
 
         checkOrderStatus(<?= $order_id ?>);
 
+        window.onload = initMap;
     </script>
 </body>
 

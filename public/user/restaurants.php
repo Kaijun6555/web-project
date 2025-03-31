@@ -6,6 +6,9 @@ if (isset($_SESSION['user_location'])) {
     $user_lat = $_SESSION['user_location']['lat'];
     $user_lon = $_SESSION['user_location']['long'];
     $user_address = $_SESSION['user_location']['address'];
+} else {
+    header("Location: /?require_location=1");
+    exit();
 }
 
 // Query to get restaurants sorted by nearest distance

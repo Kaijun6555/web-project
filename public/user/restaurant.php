@@ -15,6 +15,10 @@ if (isset($_SESSION['user_location'])) {
     $user_lon = $_SESSION['user_location']['long'];
     $user_address = $_SESSION['user_location']['address'];
 }
+else{
+    header("Location: /?require_location=1");
+    exit();
+}
 
 // Fetch restaurant details
 $stmt = $conn->prepare("SELECT name, address FROM restaurant WHERE idrestaurant = ?");
@@ -29,7 +33,7 @@ if (!$restaurant) {
 }
 
 // Fetch menu items for the restaurant
-$stmt = $conn->prepare("SELECT idmenu_item, itemName, description, price, availability, image FROM menu_item WHERE restaurant_id = ? ORDER BY itemName");
+$stmt = $conn->prepare("SELECT idmenu_item, itemName, description, price, restaurant_id, availability, image FROM menu_item WHERE restaurant_id = ? ORDER BY itemName");
 $stmt->bind_param("i", $id);
 $stmt->execute();
 $menu_result = $stmt->get_result();

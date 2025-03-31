@@ -31,6 +31,9 @@ foreach ($_SESSION['cart'] as $item) {
     $total_price += $item['price'] * $item['quantity'];
 }
 
+// Set user id variable
+$user_id = $_SESSION['user_id'];
+
 // Fetch restaurant address and details
 $stmt = $conn->prepare("SELECT `long`, lat, address, name FROM restaurant WHERE idrestaurant = ?");
 $stmt->bind_param("i", $restaurant_id);
@@ -137,13 +140,11 @@ $cancel_url = "https://www.foodfinder.shop/";
                     <input type="hidden" name="return" value="<?= $return_url ?>">
                     <input type="hidden" name="cancel_return" value="<?= $cancel_url ?>">
                     <!-- Submit Button -->
-                    <button type="submit" class="btn btn-success w-100">Pay with PayPal</button>
+                    <button type="submit" class="btn btn-success w-100" onclick="setOrderOngoing('<?=$user_id?>')">Pay with PayPal</button>
                 </form>
             </div>
         </div>
     </div>
-
-
 </body>
 
 </html>
