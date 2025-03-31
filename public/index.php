@@ -128,6 +128,7 @@ if (isset($_SESSION['payerUrl']) && !empty($_SESSION['payerUrl'])) {
             }
         </script>
     </main>
+    <?php include 'inc/footer.inc.php'; ?>
 </body>
 
 </html>
