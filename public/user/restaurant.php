@@ -148,7 +148,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST["menu_id"])) {
                             <!-- Quantity and Add to Basket Button -->
                             <div class="d-flex align-items-center mt-4">
                                 <button type="button" class="btn btn-outline-secondary" onclick="changeQuantity('qty<?= $menu_item['idmenu_item'] ?>', -1)">-</button>
-                                <input type="number" class="form-control text-center mx-2" name="quantity" id="qty<?= $menu_item['idmenu_item'] ?>" value="1" min="1" style="max-width: 80px;">
+                                <input type="number" class="form-control text-center mx-2" name="quantity" id="qty<?= $menu_item['idmenu_item'] ?>"
+                                    value="1" min="1" style="max-width: 80px;"
+                                    oninput="updateButtonPrice(<?= $menu_item['idmenu_item'] ?>, <?= $menu_item['price'] ?>)">
                                 <button type="button" class="btn btn-outline-secondary" onclick="changeQuantity('qty<?= $menu_item['idmenu_item'] ?>', 1)">+</button>
                             </div>
 
@@ -160,10 +162,15 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST["menu_id"])) {
                                 <input type="hidden" name="menu_price" value="<?= $menu_item['price'] ?>">
                                 <input type="hidden" name="restaurant_id" value="<?= $menu_item['restaurant_id'] ?>">
                                 <input type="hidden" name="quantity" id="formQty<?= $menu_item['idmenu_item'] ?>" value="1">
-                                <button class="btn btn-success w-100 mt-3" type="submit"
+                                <button
+                                    class="btn btn-success w-100 mt-3"
+                                    type="submit"
+                                    id="addBtn<?= $menu_item['idmenu_item'] ?>"
+                                    data-base-price="<?= $menu_item['price'] ?>"
                                     onclick="syncQuantityBeforeSubmit('qty<?= $menu_item['idmenu_item'] ?>', 'formQty<?= $menu_item['idmenu_item'] ?>')">
-                                    Add to Basket - <?= number_format($menu_item['price'], 2) ?>
+                                    Add to Basket - $<?= number_format($menu_item['price'], 2) ?>
                                 </button>
+
                             </form>
                         </div>
                     </div>
@@ -183,6 +190,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST["menu_id"])) {
             current += delta;
             if (current < 1) current = 1;
             input.value = current;
+            const id = inputId.replace('qty', '');
+            const price = parseFloat(document.getElementById('addBtn' + id).dataset.basePrice);
+            updateButtonPrice(id, price);
         }
 
         function syncQuantityBeforeSubmit(sourceId, targetId) {
@@ -190,7 +200,15 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST["menu_id"])) {
             const target = document.getElementById(targetId);
             target.value = source.value;
         }
+
+        function updateButtonPrice(id, unitPrice) {
+            const qty = parseInt(document.getElementById('qty' + id).value) || 1;
+            const total = (qty * unitPrice).toFixed(2);
+            const button = document.getElementById('addBtn' + id);
+            button.innerText = `Add to Basket - $${total}`;
+        }
     </script>
+
 </body>
 
 </html>

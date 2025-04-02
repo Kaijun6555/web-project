@@ -9,7 +9,7 @@ $paypalEmail = $data['paypalEmail'];
 $amount = $data['amount'];
 
 // Save PayPal email only if not already set
-$stmt = $conn->prepare("SELECT paypal_email FROM user WHERE iduser = ?");
+$stmt = $conn->prepare("SELECT paypal_email FROM user WHERE idUsers = ?");
 $stmt->bind_param("i", $user_id);
 $stmt->execute();
 $stmt->bind_result($existingEmail);
@@ -17,7 +17,7 @@ $stmt->fetch();
 $stmt->close();
 
 if (empty($existingEmail)) {
-    $stmt = $conn->prepare("UPDATE user SET paypal_email = ? WHERE iduser = ?");
+    $stmt = $conn->prepare("UPDATE Users SET paypal_email = ? WHERE idUsers = ?");
     $stmt->bind_param("si", $paypalEmail, $user_id);
     $stmt->execute();
     $stmt->close();

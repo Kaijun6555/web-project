@@ -74,7 +74,7 @@ if ($row = $order->fetch_assoc()) {  // Fetch order details
 // Fetch deliverer's PayPal email
 $paypal_email = '';
 if (!empty($user_id)) {
-    $stmt = $conn->prepare("SELECT paypal_email FROM user WHERE iduser = ?");
+    $stmt = $conn->prepare("SELECT paypal_email FROM Users WHERE idUsers = ?");
     $stmt->bind_param("i", $user_id);
     $stmt->execute();
     $stmt->bind_result($paypal_email);

@@ -32,40 +32,84 @@ $result = $stmt->get_result();
 <head>
     <title>Food</title>
     <?php include '../inc/head.inc.php'; ?>
+    <style>
+        .restaurant-card {
+            transition: box-shadow 0.3s ease;
+        }
+
+        .restaurant-card:hover {
+            box-shadow: 0 6px 16px rgba(0, 0, 0, 0.1);
+            transform: translateY(-5px);
+        }
+
+        .fixed-img {
+            object-fit: cover;
+            height: 180px;
+            border-top-left-radius: 0.5rem;
+            border-top-right-radius: 0.5rem;
+        }
+
+        .restaurant-name {
+            font-size: 1.1rem;
+            font-weight: 600;
+        }
+
+        .restaurant-distance {
+            font-size: 0.9rem;
+            color: #6c757d;
+        }
+
+        a.card-link {
+            text-decoration: none;
+            color: inherit;
+        }
+
+        a.card-link:hover {
+            text-decoration: none;
+            color: inherit;
+        }
+    </style>
 </head>
 
 <body>
     <?php include '../inc/nav.inc.php'; ?>
 
-    <div class="container mt-4">
-        <h2>Restaurants Near You</h2>
-        <ul class="list-group">
+    <div class="container mt-5">
+        <h2 class="mb-4 text-center">🍽️ Restaurants Near You</h2>
+        <div class="row g-4">
             <?php
-            $stmt = $conn->prepare("SELECT idrestaurant, name, address, image FROM restaurant WHERE approval = 1 ORDER BY name");
+            $stmt = $conn->prepare("
+                SELECT idrestaurant, name, address, image, 
+                (6371 * ACOS(COS(RADIANS(?)) * COS(RADIANS(lat)) *
+                COS(RADIANS(`long`) - RADIANS(?)) + SIN(RADIANS(?)) *
+                SIN(RADIANS(lat)))) AS distance
+                FROM restaurant
+                WHERE approval = 1
+                ORDER BY distance ASC
+            ");
+            $stmt->bind_param("ddd", $user_lat, $user_lon, $user_lat);
             $stmt->execute();
             $result = $stmt->get_result();
             $stmt->close();
 
             while ($row = $result->fetch_assoc()):
-                ?>
-                <div class="col-md-3 mt-3 mb-3 d-flex">
-                    <a class="text-decoration-none w-100" href="/user/restaurant.php?id=<?= $row['idrestaurant'] ?>">
-                        <div class="card restaurant h-100 d-flex flex-column">
-                            <img src="<?= htmlspecialchars($row['image']) ?>" class="card-img-top fixed-img"
-                                alt="store image">
-                            <a href="/user/restaurant.php?id=<?= htmlspecialchars($row['idrestaurant']) ?>">
-                                <?= htmlspecialchars($row['name']) ?> - <?= number_format($row['distance'], 2) ?> km away
-                            </a>
+            ?>
+                <div class="col-md-6 col-lg-4">
+                    <a href="/user/restaurant.php?id=<?= $row['idrestaurant'] ?>" class="card-link">
+                        <div class="card restaurant-card h-100 shadow-sm">
+                            <img src="<?= htmlspecialchars($row['image']) ?>" class="card-img-top fixed-img" alt="Restaurant Image">
+                            <div class="card-body">
+                                <p class="restaurant-name"><?= htmlspecialchars($row['name']) ?></p>
+                                <p class="restaurant-distance"><?= number_format($row['distance'], 2) ?> km away</p>
+                            </div>
                         </div>
                     </a>
                 </div>
             <?php endwhile; ?>
-        </ul>
+        </div>
     </div>
 
     <?php include '../inc/footer.inc.php'; ?>
-    <script>
-    </script>
 </body>
 
 </html>

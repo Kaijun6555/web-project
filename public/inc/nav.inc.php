@@ -111,7 +111,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST["remove_id"])) {
                         <tr>
                             <td><?= htmlspecialchars($item['name']) ?></td>
                             <td>$<?= number_format($item['price'], 2) ?></td>
-                            <td>1</td> <!-- Simple quantity handling for now -->
+                            <td><?= htmlspecialchars($item['quantity']) ?></td> <!-- Simple quantity handling for now -->
                             <td>
                                 <form method="POST">
                                     <input type="hidden" name="remove_id" value="<?= $item['id'] ?>">
