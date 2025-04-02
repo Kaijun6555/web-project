@@ -1,5 +1,5 @@
 <?php
-require '../db/db-connect.php';
+require '../../db/db-connect.php';
 session_start();
 
 // Get JSON data from frontend
