@@ -125,7 +125,6 @@ if (!empty($user_id)) {
                                 <!-- Input form for PayPal email -->
                                 <form id="paypalForm" method="post">
                                     <label for="paypalEmail">Enter PayPal Email:</label>
-                                    <label for="paypalEmail">PayPal Email:</label>
                                     <?php if (!empty($paypal_email)): ?>
                                         <input type="email" id="paypalEmail" name="paypalEmail" value="<?= htmlspecialchars($paypal_email) ?>" class="form-control" readonly />
                                     <?php else: ?>
