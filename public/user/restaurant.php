@@ -14,8 +14,7 @@ if (isset($_SESSION['user_location'])) {
     $user_lat = $_SESSION['user_location']['lat'];
     $user_lon = $_SESSION['user_location']['long'];
     $user_address = $_SESSION['user_location']['address'];
-}
-else{
+} else {
     header("Location: /?require_location=1");
     exit();
 }
@@ -46,6 +45,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST["menu_id"])) {
     $menu_price = (float) $_POST["menu_price"];
     $restaurant_id = (int) $_POST["restaurant_id"];
     $menu_image = $_POST["menu_image"];
+    $quantity = isset($_POST['quantity']) ? max(1, (int)$_POST['quantity']) : 1;
 
 
     if (!isset($_SESSION['cart'])) {
@@ -58,7 +58,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST["menu_id"])) {
         'restaurant_id' => $id,
         'name' => $menu_name,
         'price' => $menu_price,
-        'quantity' => 1,
+        'quantity' => $quantity,
         'image' => $menu_image
     ];
 
@@ -146,20 +146,22 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST["menu_id"])) {
                             </div>
 
                             <!-- Quantity and Add to Basket Button -->
-                            <div class="d-flex mt-4">
-                                <button class="btn btn-outline-secondary">-</button>
-                                <input type="text" class="form-control text-center mx-2" value="1">
-                                <button class="btn btn-outline-secondary">+</button>
+                            <div class="d-flex align-items-center mt-4">
+                                <button type="button" class="btn btn-outline-secondary" onclick="changeQuantity('qty<?= $menu_item['idmenu_item'] ?>', -1)">-</button>
+                                <input type="number" class="form-control text-center mx-2" name="quantity" id="qty<?= $menu_item['idmenu_item'] ?>" value="1" min="1" style="max-width: 80px;">
+                                <button type="button" class="btn btn-outline-secondary" onclick="changeQuantity('qty<?= $menu_item['idmenu_item'] ?>', 1)">+</button>
                             </div>
 
                             <!-- Add to Cart Form -->
-                            <form method="POST" class="d-inline">
+                            <form method="POST" class="d-inline mt-3">
                                 <input type="hidden" name="menu_id" value="<?= $menu_item['idmenu_item'] ?>">
                                 <input type="hidden" name="menu_image" value="<?= $menu_item['image'] ?>">
                                 <input type="hidden" name="menu_name" value="<?= htmlspecialchars($menu_item['itemName']) ?>">
                                 <input type="hidden" name="menu_price" value="<?= $menu_item['price'] ?>">
                                 <input type="hidden" name="restaurant_id" value="<?= $menu_item['restaurant_id'] ?>">
-                                <button class="btn btn-success w-100 mt-3" type="submit">
+                                <input type="hidden" name="quantity" id="formQty<?= $menu_item['idmenu_item'] ?>" value="1">
+                                <button class="btn btn-success w-100 mt-3" type="submit"
+                                    onclick="syncQuantityBeforeSubmit('qty<?= $menu_item['idmenu_item'] ?>', 'formQty<?= $menu_item['idmenu_item'] ?>')">
                                     Add to Basket - <?= number_format($menu_item['price'], 2) ?>
                                 </button>
                             </form>
@@ -173,6 +175,22 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST["menu_id"])) {
     </div>
 
     <?php include '../inc/footer.inc.php'; ?>
+    <script>
+        function changeQuantity(inputId, delta) {
+            const input = document.getElementById(inputId);
+            let current = parseInt(input.value);
+            if (isNaN(current)) current = 1;
+            current += delta;
+            if (current < 1) current = 1;
+            input.value = current;
+        }
+
+        function syncQuantityBeforeSubmit(sourceId, targetId) {
+            const source = document.getElementById(sourceId);
+            const target = document.getElementById(targetId);
+            target.value = source.value;
+        }
+    </script>
 </body>
 
 </html>

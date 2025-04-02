@@ -1,10 +1,27 @@
 <?php
+require '../db/db-connect.php';
+session_start();
 
 // Get JSON data from frontend
 $data = json_decode(file_get_contents('php://input'), true);
+$user_id = $_SESSION['user_id'];
 $paypalEmail = $data['paypalEmail'];
 $amount = $data['amount'];
 
+// Save PayPal email only if not already set
+$stmt = $conn->prepare("SELECT paypal_email FROM user WHERE iduser = ?");
+$stmt->bind_param("i", $user_id);
+$stmt->execute();
+$stmt->bind_result($existingEmail);
+$stmt->fetch();
+$stmt->close();
+
+if (empty($existingEmail)) {
+    $stmt = $conn->prepare("UPDATE user SET paypal_email = ? WHERE iduser = ?");
+    $stmt->bind_param("si", $paypalEmail, $user_id);
+    $stmt->execute();
+    $stmt->close();
+}
 
 // Your PayPal credentials (sandbox)
 $clientID = 'AYX3VoAfHt6l59ysb2FMJejhy4yFe670slGGzQw9H7R5ezdH8yfGzAhdeX2rn9mrWER6YxQi9eKXi-3E';   // Replace with your sandbox client ID

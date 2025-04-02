@@ -71,6 +71,17 @@ if ($row = $order->fetch_assoc()) {  // Fetch order details
     echo "No order found!";
 }
 
+// Fetch deliverer's PayPal email
+$paypal_email = '';
+if (!empty($user_id)) {
+    $stmt = $conn->prepare("SELECT paypal_email FROM user WHERE iduser = ?");
+    $stmt->bind_param("i", $user_id);
+    $stmt->execute();
+    $stmt->bind_result($paypal_email);
+    $stmt->fetch();
+    $stmt->close();
+}
+
 ?>
 
 <!DOCTYPE html>
@@ -114,7 +125,13 @@ if ($row = $order->fetch_assoc()) {  // Fetch order details
                                 <!-- Input form for PayPal email -->
                                 <form id="paypalForm" method="post">
                                     <label for="paypalEmail">Enter PayPal Email:</label>
-                                    <input type="email" id="paypalEmail" name="paypalEmail" required />
+                                    <label for="paypalEmail">PayPal Email:</label>
+                                    <?php if (!empty($paypal_email)): ?>
+                                        <input type="email" id="paypalEmail" name="paypalEmail" value="<?= htmlspecialchars($paypal_email) ?>" class="form-control" readonly />
+                                    <?php else: ?>
+                                        <input type="email" id="paypalEmail" name="paypalEmail" class="form-control" placeholder="Enter your PayPal email" required />
+                                    <?php endif; ?>
+
                                     <br><br>
                                     <button type="submit" class="btn btn-success">Confirm Email</button>
                                 </form>
