@@ -57,6 +57,13 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST["remove_id"])) {
                 </li>
 
                 <?php if (!empty($_SESSION['user_id'])): ?>
+                    <li class="nav-item me-3">
+                        <button class="btn navbar-button">
+                            <a class="text-black text-decoration-none" href="/user/settings.php">
+                                Settings
+                            </a>
+                        </button>
+                    </li>
                     <li class="nav-item dropdown me-3">
                         <button class="btn navbar-button dropdown-toggle text-black" id="user_role_dropdown" role="button"
                             data-bs-toggle="dropdown" aria-expanded="false">

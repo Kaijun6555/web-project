@@ -1,9 +1,9 @@
 <!-- chat_with_driver.php -->
 <?php
-include 'inc/head.inc.php';
-include 'inc/nav.inc.php';
+include '../inc/head.inc.php';
+include '../inc/nav.inc.php';
 session_start();
-require 'db-connect.php';
+require '../../db/db-connect.php';
 
 // Check if order ID is provided
 $order_id = isset($_GET['order_id']) ? (int) $_GET['order_id'] : 0;
@@ -71,4 +71,4 @@ document.getElementById("chat-form").addEventListener("submit", function(e) {
 });
 </script>
 
-<?php include 'inc/footer.inc.php'; ?>
+<?php include '../inc/footer.inc.php'; ?>
