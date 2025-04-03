@@ -41,7 +41,7 @@ $driver_id = $order['driver_id'];
 
 <script>
 function loadChat() {
-    fetch("load_chat.php?order_id=<?= $order_id ?>")
+    fetch("../../db/load_chat.php?order_id=<?= $order_id ?>")
         .then(response => response.text())
         .then(data => {
             document.getElementById("chat-box").innerHTML = data;
@@ -60,7 +60,7 @@ document.getElementById("chat-form").addEventListener("submit", function(e) {
     e.preventDefault();
     let message = document.getElementById("chat-message").value;
     
-    fetch("send_chat.php", {
+    fetch("../../db/send_chat.php", {
         method: "POST",
         headers: { "Content-Type": "application/x-www-form-urlencoded" },
         body: `order_id=<?= $order_id ?>&message=${encodeURIComponent(message)}`

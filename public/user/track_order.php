@@ -228,6 +228,9 @@ while ($item = $items->fetch_assoc()) {
                                 <strong>Total</strong>
                                 <strong>$<?= number_format($total_price + 1.99, 2) ?></strong>
                             </div>
+                            <a href="/user/chat_with_driver.php?order_id=<?= $order_id ?>" class="btn btn-outline-primary">
+                                Chat with Driver
+                            </a>
                         </div>
                     </div>
                 </div>
@@ -254,19 +257,25 @@ while ($item = $items->fetch_assoc()) {
 
         function initMap() {
             map = new google.maps.Map(document.getElementById('map'), {
-                center: { lat: <?= $user_lat ?>, lng: <?= $user_long ?> },
+                center: {
+                    lat: <?= $user_lat ?>,
+                    lng: <?= $user_long ?>
+                },
                 zoom: 17,
                 disableDefaultUI: true,
-                styles: [
-                    {
+                styles: [{
                         featureType: 'all',
                         elementType: 'labels',
-                        stylers: [{ visibility: 'off' }],
+                        stylers: [{
+                            visibility: 'off'
+                        }],
                     },
                     {
                         featureType: 'road',
                         elementType: 'geometry',
-                        stylers: [{ color: '#ffffff' }],
+                        stylers: [{
+                            color: '#ffffff'
+                        }],
                     },
                 ],
             });
@@ -274,14 +283,19 @@ while ($item = $items->fetch_assoc()) {
 
             // Add the "Looking for a deliverer" marker
             marker = new google.maps.Marker({
-                position: { lat: <?= $user_lat ?>, lng: <?= $user_long ?> }, // Starting point
+                position: {
+                    lat: <?= $user_lat ?>,
+                    lng: <?= $user_long ?>
+                }, // Starting point
                 map: map,
                 icon: '/static/searching-loading.gif',
                 title: "Looking for a deliverer"
             });
 
             directionsService = new google.maps.DirectionsService();
-            directionsRenderer = new google.maps.DirectionsRenderer({ suppressMarkers: true });
+            directionsRenderer = new google.maps.DirectionsRenderer({
+                suppressMarkers: true
+            });
         }
 
 
@@ -302,17 +316,17 @@ while ($item = $items->fetch_assoc()) {
         }
 
         function updateMap(status, delivery_long, delivery_lat, stored_step) {
-           
+
             // Handle Progress Bar
             if (step === 1) {
                 step = stored_step;
                 updateProgress();
             }
-            
+
             if ((status === "Order is being Prepared" || status === "Rider Pickup")) {
 
                 if (status === "Rider Pickup" && step === 2) {
-                    step+=1;
+                    step += 1;
                     updateProgress();
                 }
 
@@ -326,10 +340,12 @@ while ($item = $items->fetch_assoc()) {
                     lng: parseFloat(delivery_long)
                 };
 
-                var end = { lat: <?= $restaurant['lat'] ?>, lng: <?= $restaurant['long'] ?> };
+                var end = {
+                    lat: <?= $restaurant['lat'] ?>,
+                    lng: <?= $restaurant['long'] ?>
+                };
 
-                directionsService.route(
-                    {
+                directionsService.route({
                         origin: start,
                         destination: end,
                         travelMode: google.maps.TravelMode.WALKING
@@ -363,9 +379,7 @@ while ($item = $items->fetch_assoc()) {
                         }
                     }
                 );
-            }
-
-            else if (status === "Rider is on the way") {
+            } else if (status === "Rider is on the way") {
 
                 if (step === 3) {
                     step += 1;
@@ -391,10 +405,12 @@ while ($item = $items->fetch_assoc()) {
                 ?>
 
                 // Location of customer
-                var end = { lat: <?= $user_lat ?>, lng: <?= $user_long ?> };
+                var end = {
+                    lat: <?= $user_lat ?>,
+                    lng: <?= $user_long ?>
+                };
 
-                directionsService.route(
-                    {
+                directionsService.route({
                         origin: start,
                         destination: end,
                         travelMode: google.maps.TravelMode.WALKING
@@ -428,8 +444,7 @@ while ($item = $items->fetch_assoc()) {
                         }
                     }
                 );
-            }
-            else if (status === "Order is delivered") {
+            } else if (status === "Order is delivered") {
                 if (step === 4) {
                     step += 1;
                     updateProgress();
