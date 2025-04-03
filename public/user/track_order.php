@@ -149,6 +149,9 @@ while ($item = $items->fetch_assoc()) {
             </div>
             <div class="col-md-6">
                 <h3>Order Status <span id="order-status">Looking For Rider</span></h3>
+                <a href="/user/chat_with_driver.php?order_id=<?= $order_id ?>" class="btn btn-outline-primary">
+                    Chat with Driver
+                </a>
                 <div class="text-center">
                     <div class="d-flex justify-content-between">
                         <div class="step">
@@ -229,10 +232,6 @@ while ($item = $items->fetch_assoc()) {
                                 <strong>$<?= number_format($total_price + 1.99, 2) ?></strong>
                             </div>
                         </div>
-
-                        <a href="/user/chat_with_driver.php?order_id=<?= $order_id ?>" class="btn btn-outline-primary">
-                            Chat with Driver
-                        </a>
                     </div>
                 </div>
             </div>
