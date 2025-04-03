@@ -10,17 +10,17 @@ if ($order_id <= 0) {
 }
 
 // Fetch driver assigned to the order
-$stmt = $conn->prepare("SELECT driver_id FROM orders WHERE id = ?");
+$stmt = $conn->prepare("SELECT delivery_user_id FROM orders WHERE id = ?");
 $stmt->bind_param("i", $order_id);
 $stmt->execute();
 $result = $stmt->get_result();
 $order = $result->fetch_assoc();
 $stmt->close();
 
-if (!$order || !$order['driver_id']) {
+if (!$order || !$order['delivery_user_id']) {
     die("No driver assigned to this order yet.");
 }
-$driver_id = $order['driver_id'];
+$delivery_user_id = $order['delivery_user_id'];
 ?>
 <!DOCTYPE html>
 <html lang="en">
