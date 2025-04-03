@@ -228,10 +228,11 @@ while ($item = $items->fetch_assoc()) {
                                 <strong>Total</strong>
                                 <strong>$<?= number_format($total_price + 1.99, 2) ?></strong>
                             </div>
-                            <a href="/user/chat_with_driver.php?order_id=<?= $order_id ?>" class="btn btn-outline-primary">
-                                Chat with Driver
-                            </a>
                         </div>
+
+                        <a href="/user/chat_with_driver.php?order_id=<?= $order_id ?>" class="btn btn-outline-primary">
+                            Chat with Driver
+                        </a>
                     </div>
                 </div>
             </div>
