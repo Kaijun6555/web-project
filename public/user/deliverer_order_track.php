@@ -17,6 +17,7 @@ if (isset($_SESSION['user_location'])) {
 // Check if User is logged in
 if (isset($_SESSION['user_id'])) {
     $user_id = $_SESSION['user_id'];
+    $_SESSION['driver_id'] = $user_id;
 }
 
 if (!isset($_GET['order_id'])) {
@@ -110,6 +111,9 @@ if (!empty($user_id)) {
                 <h3>Order Status: <strong><span id="order-status">Order is being Prepared</span></strong></h3>
                 <button class="btn btn-success" id="order_collected_button" onclick="orderCollected()" disabled>Order Collected from Restaurant</button>
                 <button class="btn btn-success" id="order_completed_button" onclick="orderCompleted()" disabled>Order Completed</button>
+                <a href="/user/chat_with_customer.php?order_id=<?= $order_id ?>" class="btn btn-outline-primary">
+                    Chat with Customer
+                </a>
             </div>
             <!-- Order Completed Modal -->
             <div class="modal fade" id="orderCompleted" tabindex="-1" aria-labelledby="modalTitle" aria-hidden="true">

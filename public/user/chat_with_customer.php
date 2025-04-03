@@ -1,39 +1,45 @@
-<!-- chat_with_driver.php -->
 <?php
 session_start();
 require '../../db/db-connect.php';
 
-// Check if order ID is provided
+// Ensure driver is logged in
+if (!isset($_SESSION['driver_id'])) {
+    die("Access denied. Please log in as a driver.");
+}
+
+$driver_id = $_SESSION['driver_id'];
+
+// Validate order ID
 $order_id = isset($_GET['order_id']) ? (int) $_GET['order_id'] : 0;
 if ($order_id <= 0) {
     die("Invalid order ID.");
 }
 
-// Fetch driver assigned to the order
-$stmt = $conn->prepare("SELECT delivery_user_id FROM Orders WHERE idOrders = ?");
-$stmt->bind_param("i", $order_id);
+// Make sure the driver is assigned to this order
+$stmt = $conn->prepare("SELECT customer_user_id FROM Orders WHERE idOrders = ? AND delivery_user_id = ?");
+$stmt->bind_param("ii", $order_id, $driver_id);
 $stmt->execute();
 $result = $stmt->get_result();
 $order = $result->fetch_assoc();
 $stmt->close();
 
-if (!$order || !$order['delivery_user_id']) {
-    die("No driver assigned to this order yet.");
+if (!$order || !$order['customer_user_id']) {
+    die("You're not assigned to this order, or no customer found. order_id: $order_id, driver_id: $driver_id");
 }
-$delivery_user_id = $order['delivery_user_id'];
+
 ?>
 <!DOCTYPE html>
 <html lang="en">
 
 <head>
-    <title>Food</title>
+    <title>Chat with Customer</title>
     <?php include '../inc/head.inc.php'; ?>
 </head>
 
 <body>
     <?php include '../inc/nav.inc.php'; ?>
     <div class="container mt-4">
-        <h2>Chat with Your Driver</h2>
+        <h2>Chat with Customer</h2>
         <div id="chat-box" class="chat-box border p-3 mb-3" style="height: 300px; overflow-y: scroll;">
             <!-- Chat messages will be loaded here dynamically -->
         </div>
@@ -46,27 +52,25 @@ $delivery_user_id = $order['delivery_user_id'];
         </form>
     </div>
 
-    <body>
-
+<?php include '../inc/footer.inc.php'; ?>
+</body>
 </html>
+
 <script>
     function loadChat() {
         fetch("/user/load_chat.php?order_id=<?= $order_id ?>")
             .then(response => response.text())
             .then(data => {
-                document.getElementById("chat-box").innerHTML = data;
-                document.getElementById("chat-box").scrollTop = document.getElementById("chat-box").scrollHeight;
+                const chatBox = document.getElementById("chat-box");
+                chatBox.innerHTML = data;
+                chatBox.scrollTop = chatBox.scrollHeight;
             });
     }
 
-    // Auto-refresh chat every 3 seconds
     setInterval(loadChat, 3000);
-
-    // Load chat initially
     loadChat();
 
-    // Handle message sending with AJAX
-    document.getElementById("chat-form").addEventListener("submit", function(e) {
+    document.getElementById("chat-form").addEventListener("submit", function (e) {
         e.preventDefault();
         let message = document.getElementById("chat-message").value;
 
@@ -75,12 +79,10 @@ $delivery_user_id = $order['delivery_user_id'];
             headers: {
                 "Content-Type": "application/x-www-form-urlencoded"
             },
-            body: `order_id=<?= $order_id ?>&message=${encodeURIComponent(message)}&sender=customer`
+            body: `order_id=<?= $order_id ?>&message=${encodeURIComponent(message)}&sender=driver`
         }).then(response => {
             document.getElementById("chat-message").value = "";
             loadChat();
         });
     });
 </script>
-
-<?php include '../inc/footer.inc.php'; ?>
