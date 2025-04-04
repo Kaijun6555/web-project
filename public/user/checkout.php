@@ -98,9 +98,7 @@ $cancel_url = "https://www.foodfinder.shop/";
                     <div class="row mb-4">
                         <div class="col-12">
                             <div class="d-flex align-items-center">
-                                <button class="btn btn-outline-secondary btn-sm me-2">–</button>
                                 <span><?= $item['quantity'] ?></span>
-                                <button class="btn btn-outline-secondary btn-sm ms-2">+</button>
                                 <img src="<?= htmlspecialchars($item['image']) ?>" class="rounded me-3 custom-size"
                                     alt="Item Image">
                                 <div>
