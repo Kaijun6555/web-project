@@ -10,25 +10,37 @@ if (isset($_SESSION['user_location'])) {
     $user_address = $_SESSION['user_location']['address'];
 }
 
+$order_id = 0;
+
 // Check if a user is logged in and if they have an incomplete order (status != 5)
 $trackingOrderId = null;
 if (isset($_SESSION['user_id'])) {
-    $stmt = $conn->prepare("SELECT idOrders FROM Orders WHERE customer_user_id = ? AND status != 5 ORDER BY created_at DESC LIMIT 1");
-    $stmt->bind_param("i", $_SESSION['user_id']);
+    $stmt = $conn->prepare("SELECT idOrders, customer_user_id, delivery_user_id FROM Orders WHERE (customer_user_id = ? OR delivery_user_id = ?) AND status != 5 ORDER BY created_at DESC LIMIT 1");
+    $stmt->bind_param("ii", $_SESSION['user_id'], $_SESSION['user_id']);
     $stmt->execute();
     $result = $stmt->get_result();
+
     if ($result && $result->num_rows > 0) {
         $row = $result->fetch_assoc();
         $trackingOrderId = $row['idOrders'];
         // Store the order ID in session for tracking_order.php to retrieve
         $_SESSION['tracking_order'] = $trackingOrderId;
+        // Determine user type
+        if ($row['customer_user_id'] == $_SESSION['user_id']) {
+            $_SESSION['user_type'] = 'customer';
+        } elseif ($row['delivery_user_id'] == $_SESSION['user_id']) {
+            $_SESSION['user_type'] = 'delivery';}
+        $order_id = $row['idOrders'];
     }
     $stmt->close();
 }
+
 // Determine the tracking URL:
 // If the session contains a 'payerUrl' (set in track_order.php when redirected by the payment gateway),
 // use that URL; otherwise, use the default tracking page.
-$trackingUrl = "/user/track_order.php";
+$trackingUrl_customer = "/user/track_order.php";
+$trackingUrl_delivery = "/user/deliverer_order_track.php?order_id=$order_id";
+$trackingUrl = null;
 if (isset($_SESSION['payerUrl']) && !empty($_SESSION['payerUrl'])) {
     $trackingUrl = $_SESSION['payerUrl'];
 }
@@ -45,12 +57,19 @@ if (isset($_SESSION['payerUrl']) && !empty($_SESSION['payerUrl'])) {
 <body>
     <?php include 'inc/nav.inc.php'; ?>
     <main class="container">
-        
+
         <!-- Display Resume Tracking Button if an incomplete order exists -->
         <?php if ($trackingOrderId): ?>
             <br>
             <div class="alert alert-info mt-3">
                 You have an ongoing order.
+                <?php
+                if ($_SESSION['user_type'] == 'customer') {
+                    $trackingUrl = $trackingUrl_customer;
+                } elseif ($_SESSION['user_type'] == 'delivery') {
+                    $trackingUrl = $trackingUrl_delivery;
+                }
+                ?>
                 <a href="<?= htmlspecialchars($trackingUrl) ?>" class="btn btn-warning ms-2">Resume Tracking</a>
             </div>
         <?php endif; ?>
@@ -91,7 +110,9 @@ if (isset($_SESSION['payerUrl']) && !empty($_SESSION['payerUrl'])) {
             </div>
             <div class="col-md-8 text-center">
                 <img src="/static/main-image2.png" class="mt-5 d-none d-md-block" alt="hero image" width="100%">
-                <h4>Satisfy your hunger and your wallet!<br><h6>Order food or deliver meals and make money on the go!</h6></h4>
+                <h4>Satisfy your hunger and your wallet!<br>
+                    <h6>Order food or deliver meals and make money on the go!</h6>
+                </h4>
             </div>
         </div>
         <hr>

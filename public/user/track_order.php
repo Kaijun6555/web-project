@@ -304,7 +304,7 @@ while ($item = $items->fetch_assoc()) {
 
 
         // Map Variables
-        let map, marker, directionsService, directionsRenderer;
+        let map, marker, directionsService, directionsRenderer, startMarker, endMarker;
 
         function initMap() {
             map = new google.maps.Map(document.getElementById('map'), {
@@ -391,8 +391,15 @@ while ($item = $items->fetch_assoc()) {
                     (response, status) => {
                         if (status === "OK") {
                             directionsRenderer.setDirections(response);
+
+                            //Before setting marker, remove prvious marker
+                            if (startMarker || endMarker) {
+                                startMarker.setMap(null);
+                                endMarker.setMap(null);
+                            }
+
                             // Set marker at the delivery rider's location with start icon
-                            var startMarker = new google.maps.Marker({
+                            startMarker = new google.maps.Marker({
                                 position: start,
                                 map: map,
                                 icon: {
@@ -403,7 +410,7 @@ while ($item = $items->fetch_assoc()) {
                             });
 
                             // Set marker at the restaurant's location with end icon
-                            var endMarker = new google.maps.Marker({
+                            endMarker = new google.maps.Marker({
                                 position: end,
                                 map: map,
                                 icon: {
@@ -456,8 +463,14 @@ while ($item = $items->fetch_assoc()) {
                     (response, status) => {
                         if (status === "OK") {
                             directionsRenderer.setDirections(response);
+
+                            if (startMarker) {
+                                startMarker.setMap(null);
+                                endMarker.setMap(null);
+                            }
+
                             // Set marker at the delivery rider's location with start icon
-                            var startMarker = new google.maps.Marker({
+                            startMarker = new google.maps.Marker({
                                 position: start,
                                 map: map,
                                 icon: {
@@ -468,7 +481,7 @@ while ($item = $items->fetch_assoc()) {
                             });
 
                             // Set marker at the restaurant's location with end icon
-                            var endMarker = new google.maps.Marker({
+                            endMarker = new google.maps.Marker({
                                 position: end,
                                 map: map,
                                 icon: {

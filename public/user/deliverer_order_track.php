@@ -27,6 +27,12 @@ if (!isset($_GET['order_id'])) {
 
 $order_id = $_GET['order_id'];
 
+// Store in session
+$_SESSION['order'][] = [
+    "order_id" => $order_id,
+];
+
+
 // Prepare the statement to check the current status
 $stmt = $conn->prepare("SELECT status FROM Orders WHERE idOrders = ?");
 $stmt->bind_param("i", $order_id);
@@ -276,6 +282,13 @@ if (!empty($user_id)) {
                     (response, status) => {
                         if (status === "OK") {
                             directionsRenderer.setDirections(response);
+
+                            //Before setting marker, remove prvious marker
+                            if (startMarker) {
+                                startMarker.setMap(null);
+                                endMarker.setMap(null);
+                            }
+
                             // Set marker at the delivery rider's location with start icon
                             startMarker = new google.maps.Marker({
                                 position: start,
@@ -314,6 +327,7 @@ if (!empty($user_id)) {
                 marker.setMap(null);
                 directionsRenderer.setMap(map);
 
+
                 // Live location of delivery rider
                 var start = {
                     lat: parseFloat(delivery_lat),
@@ -332,6 +346,13 @@ if (!empty($user_id)) {
                     (response, status) => {
                         if (status === "OK") {
                             directionsRenderer.setDirections(response);
+
+
+                            if (startMarker) {
+                                startMarker.setMap(null);
+                                endMarker.setMap(null);
+                            }
+
                             // Set marker at the delivery rider's location with start icon
                             var startMarker = new google.maps.Marker({
                                 position: start,
@@ -377,6 +398,7 @@ if (!empty($user_id)) {
                 },
                 body: JSON.stringify({
                     paypalEmail: paypalEmail,
+                    service: "Delivery"
                     amount: 1.99
                 })
             })

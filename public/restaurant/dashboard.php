@@ -156,6 +156,7 @@ $stmt->close();
                             },
                             body: JSON.stringify({
                                 paypalEmail: paypalEmail,
+                                service: "Merchant",
                                 amount: total_price
                             })
                         })

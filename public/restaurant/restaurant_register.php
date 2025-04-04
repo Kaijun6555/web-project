@@ -79,7 +79,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         } else {
             // Insert new user
             $stmt = $conn->prepare("INSERT INTO restaurant (name, email, address, image, verification, password, `long`, lat) VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
-            $stmt->bind_param("ssssssdd", $name, $email, $address, $verification_image_file_path, $verification_file_path, $hashed_password, $lon, $lat);
+            $stmt->bind_param("ssssssdd", $name, $email, $address, $image, $verification_file_path, $hashed_password, $lon, $lat);
 
             if ($stmt->execute()) {
                 header("Location: restaurant_login.php?register_success=1");

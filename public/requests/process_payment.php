@@ -7,6 +7,9 @@ $data = json_decode(file_get_contents('php://input'), true);
 $user_id = $_SESSION['user_id'];
 $paypalEmail = $data['paypalEmail'];
 $amount = $data['amount'];
+$service = $data['service'];
+
+$service_payment_note = $service . 'Payment for services';
 
 // Save PayPal email only if not already set
 $stmt = $conn->prepare("SELECT paypal_email FROM Users WHERE idUsers = ?");
@@ -52,14 +55,14 @@ function getAccessToken($clientID, $secret)
 }
 
 // Step 2: Send Payment (Payout)
-function sendPayout($accessToken, $recipientEmail, $amount)
+function sendPayout($accessToken, $recipientEmail, $amount, $service_payment_note)
 {
     $url = 'https://api.sandbox.paypal.com/v1/payments/payouts';
 
     // Create the payout request
     $payoutData = [
         'sender_batch_header' => [
-            'email_subject' => 'You have a payment',
+            'email_subject' => 'FOODFINDER PTE LTD Payment',
             'recipient_type' => 'EMAIL'
         ],
         'items' => [
@@ -69,7 +72,7 @@ function sendPayout($accessToken, $recipientEmail, $amount)
                     'value' => $amount,
                     'currency' => 'SGD'
                 ],
-                'note' => 'Payment for services',
+                'note' => $service_payment_note,
                 'receiver' => $recipientEmail
             ]
         ]
@@ -99,7 +102,7 @@ try {
     $accessToken = getAccessToken($clientID, $secret);
 
     // Send the payout to the recipient
-    $payoutResponse = sendPayout($accessToken, $paypalEmail, $amount);
+    $payoutResponse = sendPayout($accessToken, $paypalEmail, $amount, $service_payment_note);
 
     // Step 4: Handle the response from PayPal
     if (isset($payoutResponse->batch_header->batch_status) && ($payoutResponse->batch_header->batch_status == 'PENDING')) {
