@@ -27,13 +27,9 @@
             <a href="#" class="d-flex align-items-center text-white text-decoration-none dropdown-toggle"
                 id="dropdownUser1" data-bs-toggle="dropdown" aria-expanded="false">
                 <img src="https://github.com/mdo.png" alt="hugenerd" width="30" height="30" class="rounded-circle">
-                <span class="d-none d-sm-inline mx-1">Restaurant Name</span>
+                <span class="d-none d-sm-inline mx-1"><?= $restaurant_name ?></span>
             </a>
             <ul class="dropdown-menu dropdown-menu-dark text-small shadow">
-
-                <li>
-                    <hr class="dropdown-divider">
-                </li>
                 <li><a class="dropdown-item" href="/logout.php">Sign out</a></li>
             </ul>
         </div>

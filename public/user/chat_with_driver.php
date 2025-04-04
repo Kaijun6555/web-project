@@ -1,72 +1,84 @@
-<!-- chat_with_driver.php -->
 <?php
 session_start();
 require '../../db/db-connect.php';
 
-// Check if order ID is provided
+// Initialize variables
+$error_message = null;
 $order_id = isset($_GET['order_id']) ? (int) $_GET['order_id'] : 0;
+
+// Validate order ID
 if ($order_id <= 0) {
-    die("Invalid order ID.");
+    $error_message = "Invalid order ID.";
 }
 
-// Fetch driver assigned to the order
-$stmt = $conn->prepare("SELECT delivery_user_id FROM Orders WHERE idOrders = ?");
-$stmt->bind_param("i", $order_id);
-$stmt->execute();
-$result = $stmt->get_result();
-$order = $result->fetch_assoc();
-$stmt->close();
+// Fetch driver info for the order
+if (!$error_message) {
+    $stmt = $conn->prepare("SELECT delivery_user_id FROM Orders WHERE idOrders = ?");
+    $stmt->bind_param("i", $order_id);
+    $stmt->execute();
+    $result = $stmt->get_result();
+    $order = $result->fetch_assoc();
+    $stmt->close();
 
-if (!$order || !$order['delivery_user_id']) {
-    die("No driver assigned to this order yet.");
+    if (!$order || !$order['delivery_user_id']) {
+        $error_message = "No driver assigned to this order yet.";
+    } else {
+        $delivery_user_id = $order['delivery_user_id'];
+    }
 }
-$delivery_user_id = $order['delivery_user_id'];
 ?>
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
-    <title>Food</title>
+    <title>Chat with Driver</title>
     <?php include '../inc/head.inc.php'; ?>
 </head>
 
 <body>
     <?php include '../inc/nav.inc.php'; ?>
     <div class="container mt-4">
-        <h2>Chat with Your Driver</h2>
-        <div id="chat-box" class="chat-box border p-3 mb-3" style="height: 300px; overflow-y: scroll;">
-            <!-- Chat messages will be loaded here dynamically -->
-        </div>
-
-        <form id="chat-form" method="POST">
-            <div class="mb-3">
-                <textarea id="chat-message" name="message" class="form-control" placeholder="Type your message..." required></textarea>
+        <?php if ($error_message): ?>
+            <div class="alert alert-danger">
+                <h4 class="alert-heading">Error</h4>
+                <p><?= htmlspecialchars($error_message) ?></p>
+                <hr>
+                <button onclick="history.back()" class="btn btn-secondary">Go Back</button>
             </div>
-            <button type="submit" class="btn btn-primary">Send</button>
-        </form>
+        <?php else: ?>
+            <h2>Chat with Your Driver</h2>
+            <div id="chat-box" class="chat-box border p-3 mb-3" style="height: 300px; overflow-y: scroll;">
+                <!-- Chat messages will be loaded here dynamically -->
+            </div>
+
+            <form id="chat-form" method="POST">
+                <div class="mb-3">
+                    <textarea id="chat-message" name="message" class="form-control" placeholder="Type your message..." required></textarea>
+                </div>
+                <button type="submit" class="btn btn-primary">Send</button>
+            </form>
+        <?php endif; ?>
     </div>
 
-    <body>
-
+<?php include '../inc/footer.inc.php'; ?>
+</body>
 </html>
+
+<?php if (!$error_message): ?>
 <script>
     function loadChat() {
         fetch("/user/load_chat.php?order_id=<?= $order_id ?>")
             .then(response => response.text())
             .then(data => {
-                document.getElementById("chat-box").innerHTML = data;
-                document.getElementById("chat-box").scrollTop = document.getElementById("chat-box").scrollHeight;
+                const chatBox = document.getElementById("chat-box");
+                chatBox.innerHTML = data;
+                chatBox.scrollTop = chatBox.scrollHeight;
             });
     }
 
-    // Auto-refresh chat every 3 seconds
     setInterval(loadChat, 3000);
-
-    // Load chat initially
     loadChat();
 
-    // Handle message sending with AJAX
-    document.getElementById("chat-form").addEventListener("submit", function(e) {
+    document.getElementById("chat-form").addEventListener("submit", function (e) {
         e.preventDefault();
         let message = document.getElementById("chat-message").value;
 
@@ -82,5 +94,4 @@ $delivery_user_id = $order['delivery_user_id'];
         });
     });
 </script>
-
-<?php include '../inc/footer.inc.php'; ?>
+<?php endif; ?>
