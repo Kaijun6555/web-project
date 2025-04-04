@@ -1,5 +1,5 @@
 <?php
-require '../db/db-connect.php';
+require '../../db/db-connect.php';
 session_start();
 
 // Get JSON data from frontend
@@ -9,7 +9,7 @@ $paypalEmail = $data['paypalEmail'];
 $amount = $data['amount'];
 
 // Save PayPal email only if not already set
-$stmt = $conn->prepare("SELECT paypal_email FROM user WHERE idUsers = ?");
+$stmt = $conn->prepare("SELECT paypal_email FROM Users WHERE idUsers = ?");
 $stmt->bind_param("i", $user_id);
 $stmt->execute();
 $stmt->bind_result($existingEmail);
@@ -24,8 +24,8 @@ if (empty($existingEmail)) {
 }
 
 // Your PayPal credentials (sandbox)
-$clientID = 'AYX3VoAfHt6l59ysb2FMJejhy4yFe670slGGzQw9H7R5ezdH8yfGzAhdeX2rn9mrWER6YxQi9eKXi-3E';   // Replace with your sandbox client ID
-$secret = 'EFSfkijDCxoTV3a3sXgP6uc8qiwe9w94iVv1iFqtrT-2vmAPnizDT3QJmR6NoIuRzX4jNjpWiG3iKt38';        // Replace with your sandbox secret
+$clientID = 'AYX3VoAfHt6l59ysb2FMJejhy4yFe670slGGzQw9H7R5ezdH8yfGzAhdeX2rn9mrWER6YxQi9eKXi-3E';   
+$secret = 'EFSfkijDCxoTV3a3sXgP6uc8qiwe9w94iVv1iFqtrT-2vmAPnizDT3QJmR6NoIuRzX4jNjpWiG3iKt38';  
 
 // Step 1: Get PayPal Access Token
 function getAccessToken($clientID, $secret)

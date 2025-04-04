@@ -109,6 +109,15 @@ $stmt->execute();
 $items = $stmt->get_result();
 $stmt->close();
 
+// Retrieve Order Date from Mysql table
+$stmt = $conn->prepare("SELECT DATE_FORMAT(created_at, '%Y-%m-%d %r') AS formatted_date FROM Orders WHERE idOrders = ?");
+$stmt->bind_param("i", $order_id);
+$stmt->execute();
+$result = $stmt->get_result();
+$order = $result->fetch_assoc();
+$order_date = $order['formatted_date'];
+$stmt->close();
+
 while ($item = $items->fetch_assoc()) {
     $menu_item_id = $item['menu_item_id'];
     $quantity = $item['quantity'];
@@ -145,41 +154,83 @@ while ($item = $items->fetch_assoc()) {
     <div class="container mt-4">
         <div class="row">
             <div class="col-md-6">
-                <div id="map" style="height: 500px;"></div>
+                <div id="map"></div>
             </div>
             <div class="col-md-6">
-                <h3>Order Status <span id="order-status">Looking For Rider</span></h3>
-                <div class="text-center">
-                    <div class="d-flex justify-content-between">
-                        <div class="step">
-                            <span class="step-circle active" id="step1"></span>
-                            <div>Looking for Rider</div>
-                        </div>
-                        <div class="step">
-                            <span class="step-circle" id="step2"></span>
-                            <div>Order being prepared</div>
-                        </div>
-                        <div class="step">
-                            <span class="step-circle" id="step3"></span>
-                            <div>Order ready to be Picked Up</div>
-                        </div>
-                        <div class="step">
-                            <span class="step-circle" id="step4"></span>
-                            <div>Order is On the way!</div>
-                        </div>
-                        <div class="step">
-                            <span class="step-circle" id="step5"></span>
-                            <div>Delivered</div>
+                <div class="row">
+                    <div class="col-md-12 bg-light rounded p-4 orange-text">
+                        <h3>Order Status <span id="order-status">Looking For Rider</span></h3>
+                        <div class="text-center">
+                            <div class="d-flex justify-content-between">
+                                <div class="step">
+                                    <span class="step-circle active" id="step1"></span>
+                                    <div>Looking for Rider</div>
+                                </div>
+                                <div class="step">
+                                    <span class="step-circle" id="step2"></span>
+                                    <div>Rider found! Order is being prepared</div>
+                                </div>
+                                <div class="step">
+                                    <span class="step-circle" id="step3"></span>
+                                    <div>Order ready to be Picked Up</div>
+                                </div>
+                                <div class="step">
+                                    <span class="step-circle" id="step4"></span>
+                                    <div>Order is On the way!</div>
+                                </div>
+                                <div class="step">
+                                    <span class="step-circle" id="step5"></span>
+                                    <div>Delivered</div>
+                                </div>
+                            </div>
+
+                            <div class="progress mt-2">
+                                <div id="progress-bar" class="progress-bar bg-success" style="width: 20%;"></div>
+                            </div>
+
                         </div>
                     </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-12 bg-light mt-4 p-4 rounded">
+                        <div class="d-flex justify-content-between">
+                            <h5>Order Summary</h5>
+                        </div>
+                        <p class="mb-1 text-muted"><?=$order_date?></p>
+                        
+                        <p class="mb-1"><strong>Restaurant</strong></p>
+                        <p class="text-muted small"><?= $restaurant['name'] ?></p>
 
-                    <div class="progress mt-2">
-                        <div id="progress-bar" class="progress-bar bg-success" style="width: 20%;"></div>
+                        <div class="bg-white p-3 rounded">
+                            <?php foreach ($orderDetails as $order_item): ?>
+                                <div class="d-flex justify-content-between">
+                                    <span><?= $order_item['quantity'] ?> X <?= $order_item['name'] ?></span>
+                                    <strong>$<?= number_format($order_item['price'] * $order_item['quantity'], 2) ?></strong>
+                                </div>
+                            <?php endforeach; ?>
+                            <hr>
+                            <div class="d-flex justify-content-between text-success"><strong>Food Cost</strong>
+                                <strong>$<?= number_format($total_price, 2) ?></strong>
+                            </div>
+                        </div>
+
+                        <div class="mt-3">
+                            <div class="d-flex justify-content-between text-danger">
+                                <span>Delivery Fee</span>
+                                <strong>$1.99</strong>
+                            </div>
+                            <hr>
+                            <div class="d-flex justify-content-between text-success">
+                                <strong>Total</strong>
+                                <strong>$<?= number_format($total_price + 1.99, 2) ?></strong>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
     </div>
+
     <!-- Order Delivered Modal -->
     <div class="modal fade" id="orderDelivered" tabindex="-1" aria-labelledby="modalTitle" aria-hidden="true">
         <div class="modal-dialog modal-lg">
@@ -302,17 +353,17 @@ while ($item = $items->fetch_assoc()) {
         }
 
         function updateMap(status, delivery_long, delivery_lat, stored_step) {
-           
+
             // Handle Progress Bar
             if (step === 1) {
                 step = stored_step;
                 updateProgress();
             }
-            
+
             if ((status === "Order is being Prepared" || status === "Rider Pickup")) {
 
                 if (status === "Rider Pickup" && step === 2) {
-                    step+=1;
+                    step += 1;
                     updateProgress();
                 }
 

@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
   <title>About Us - Food Finder</title>
@@ -12,30 +13,37 @@
       text-align: center;
       padding: 100px 20px;
     }
+
     .hero h1 {
       font-size: 3rem;
       font-weight: bold;
     }
+
     .hero p {
       font-size: 1.25rem;
     }
+
     .about-section {
       padding: 60px 0;
     }
+
     .section-title {
       margin-bottom: 30px;
       font-size: 2rem;
       font-weight: 600;
     }
+
     .about-img {
       width: 100%;
       border-radius: 8px;
       margin-bottom: 20px;
     }
+
     .about-text {
       font-size: 1.1rem;
       line-height: 1.6;
     }
+
     .about-list li::before {
       content: "✔ ";
       color: #FF7E14;
@@ -43,6 +51,7 @@
     }
   </style>
 </head>
+
 <body>
   <?php include 'inc/nav.inc.php'; ?>
 
@@ -62,9 +71,11 @@
       <div class="col-md-6">
         <h2 class="section-title">Our Story</h2>
         <p class="about-text">
-          Food Finder was founded with one mission in mind: to make great food accessible to everyone, anytime, anywhere.
+          Food Finder was founded with one mission in mind: to make great food accessible to everyone, anytime,
+          anywhere.
           We bring you an easy-to-use platform that connects hungry customers with the best local restaurants.
-          Our passion for food and innovation drives us to continually improve your delivery experience.
+          Satisfy your hunger and your wallet!
+          Order food or deliver meals and make money on the go!
         </p>
       </div>
     </div>
@@ -76,9 +87,9 @@
       <div class="col-md-6 order-md-1">
         <h2 class="section-title">Our Mission</h2>
         <p class="about-text">
-          Our mission is to revolutionize the way you enjoy food. Whether you're ordering for yourself or sharing a meal with loved ones,
-          Food Finder is committed to providing a seamless and satisfying food delivery experience by partnering with top local restaurants
-          and leveraging cutting-edge technology.
+          Our mission is to revolutionize the way you enjoy food. Whether you're ordering for yourself or sharing a meal
+          with loved ones,
+          Food Finder is committed to allowing anyone be a delivery rider anytime they want! Earning themselves cash on the go.
         </p>
       </div>
     </div>
@@ -107,7 +118,8 @@
         <p class="about-text">
           Our team is made up of food enthusiasts, tech innovators, and customer service experts.
           Together, we work to deliver a superior food ordering experience.
-          We believe in fostering a culture of creativity and collaboration to keep our service dynamic and ever-evolving.
+          We believe in fostering a culture of creativity and collaboration to keep our service dynamic and
+          ever-evolving.
         </p>
       </div>
     </div>
@@ -128,4 +140,5 @@
 
   <?php include 'inc/footer.inc.php'; ?>
 </body>
+
 </html>

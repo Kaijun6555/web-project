@@ -32,6 +32,7 @@ async function getReadableAddress(lat, lng) {
 
 // Convert on server side when user manually enters
 async function convertAddressToLatLng() {
+    
     let address = document.getElementById("location").value;
 
     if (!address) return alert("Please enter an address");
@@ -148,7 +149,7 @@ function SaveDeliveryRiderLocation(order) {
     navigator.geolocation.getCurrentPosition(
         (position) => {
             let lat = position.coords.latitude;
-            let lng =  position.coords.longitude;
+            let lng = position.coords.longitude;
             // Store Delivery Rider's Current Location
             fetch('/requests/process_deliverer_location.php', {
                 method: 'POST',
@@ -165,4 +166,19 @@ function SaveDeliveryRiderLocation(order) {
             console.error("Error getting location:", error);
         }
     );
+}
+
+
+async function handleInput(event) {
+    const userInput = event.target.value;
+    const restaurant_lng = document.getElementById("restaurant_lng");
+    const restaurant_lat = document.getElementById("restaurant_lat");
+
+    if (userInput.trim !== "") {
+        if (userInput.length > 5) {
+            const result = await convertAddressToLatLng();
+            restaurant_lat.value = result[0];
+            restaurant_lng.value = result[1];
+        }
+    }
 }

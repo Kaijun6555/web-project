@@ -13,7 +13,10 @@ function sanitize_input($data)
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $name = sanitize_input($_POST['name']);
     $email = sanitize_input($_POST['email']);
-    $address = sanitize_input($_POST['address']);
+    $address = sanitize_input($_POST['location']);
+
+    $lon = sanitize_input($_POST['restaurant_lon']);
+    $lat = sanitize_input($_POST['restaurant_lat']);
 
     $verification_file_tmp_path = $_FILES['verification']['tmp_name'];
     $verification_file_name = $_FILES['verification']['name'];
@@ -80,8 +83,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             $error = "Email is already registered.";
         } else {
             // Insert new user
-            $stmt = $conn->prepare("INSERT INTO restaurant (name, email, address, image, verification, password) VALUES (?, ?, ?, ?, ?, ?)");
-            $stmt->bind_param("ssssss", $name, $email, $address, $verification_image_file_path, $verification_file_path, $hashed_password);
+            $stmt = $conn->prepare("INSERT INTO restaurant (name, email, address, image, verification, password, `long`, lat) VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
+            $stmt->bind_param("ssssss", $name, $email, $address, $verification_image_file_path, $verification_file_path, $hashed_password, $lon, $lat);
 
             if ($stmt->execute()) {
                 header("Location: restaurant_login.php?register_success=1");
@@ -121,11 +124,11 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             </div>
             <div class="mb-3">
                 <label>Merchant Address</label>
-                <input type="text" name="address" class="form-control" required>
+                <input type="text" name="location" class="form-control" oninput="handleInput(event)" required>
             </div>
             <div class="mb-3">
-                <label>Verification: Please Submit an image </label>
-                <input type="file" name="verification_image" class="form-control">
+                <label>Please Provide Link to an image </label>
+                <input type="text" name="image" class="form-control">
             </div>
             <div class="mb-3">
                 <label>Verification: Please Submit an .pdf or .doc file</label>
@@ -139,6 +142,10 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                 <label>Confirm Password</label>
                 <input type="password" name="confirm_password" class="form-control" required>
             </div>
+
+            <input type="hidden" name="restaurant_lon" class="form-control" required>
+            <input type="hidden" name="restaurant_lat" class="form-control" required>
+
             <button type="submit" class="btn btn-primary">Register</button>
         </form>
     </div>

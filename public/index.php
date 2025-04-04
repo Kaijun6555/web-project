@@ -89,8 +89,9 @@ if (isset($_SESSION['payerUrl']) && !empty($_SESSION['payerUrl'])) {
                     </div>
                 </div>
             </div>
-            <div class="col-md-8">
+            <div class="col-md-8 text-center">
                 <img src="/static/main-image2.png" class="mt-5 d-none d-md-block" alt="hero image" width="100%">
+                <h4>Satisfy your hunger and your wallet!<br><h6>Order food or deliver meals and make money on the go!</h6></h4>
             </div>
         </div>
         <hr>
