@@ -26,11 +26,9 @@ if (empty($existingEmail)) {
     $stmt->close();
 }
 
-// Your PayPal credentials (sandbox)
 $clientID = 'AYX3VoAfHt6l59ysb2FMJejhy4yFe670slGGzQw9H7R5ezdH8yfGzAhdeX2rn9mrWER6YxQi9eKXi-3E';   
 $secret = 'EFSfkijDCxoTV3a3sXgP6uc8qiwe9w94iVv1iFqtrT-2vmAPnizDT3QJmR6NoIuRzX4jNjpWiG3iKt38';  
 
-// Step 1: Get PayPal Access Token
 function getAccessToken($clientID, $secret)
 {
     $url = 'https://api.sandbox.paypal.com/v1/oauth2/token';
@@ -54,7 +52,6 @@ function getAccessToken($clientID, $secret)
     return $responseObj->access_token;
 }
 
-// Step 2: Send Payment (Payout)
 function sendPayout($accessToken, $recipientEmail, $amount, $service_payment_note)
 {
     $url = 'https://api.sandbox.paypal.com/v1/payments/payouts';
@@ -96,7 +93,6 @@ function sendPayout($accessToken, $recipientEmail, $amount, $service_payment_not
     return $responseObj;
 }
 
-// Step 3: Main Process
 try {
     // Get the access token
     $accessToken = getAccessToken($clientID, $secret);
@@ -104,7 +100,6 @@ try {
     // Send the payout to the recipient
     $payoutResponse = sendPayout($accessToken, $paypalEmail, $amount, $service_payment_note);
 
-    // Step 4: Handle the response from PayPal
     if (isset($payoutResponse->batch_header->batch_status) && ($payoutResponse->batch_header->batch_status == 'PENDING')) {
         echo json_encode(['message' => $payoutResponse->batch_header->batch_status]);
     } else {
