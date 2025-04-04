@@ -169,30 +169,6 @@ function SaveDeliveryRiderLocation(order) {
 }
 
 
-// Convert on server side when user manually enters
-async function submitRestaurant() {
-    let address = document.getElementById("address").value;
-
-    if (!address) return alert("Please enter an address");
-
-    const url = `https://maps.googleapis.com/maps/api/geocode/json?address=${encodeURIComponent(address)}&key=${API_KEY}`;
-    let response = await fetch(url);
-    let data = await response.json();
-
-    if (data.status === "OK") {
-        let location = data.results[0].geometry.location;
-        let [lat, lng] = [location.lat, location.lng];
-        document.getElementById('restaurant_lat').value = lat;
-        document.getElementById('restaurant_lng').value = lng;
-
-        var form = document.getElementById("merchant_form");
-
-        form.submit();
-
-    } else {
-        alert("Error found");
-    }
-}
 
 
 async function handleInput(event) {
