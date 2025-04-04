@@ -2,6 +2,7 @@
 require '../db/db-connect.php';
 session_start();
 
+
 // Check for location
 if (isset($_SESSION['user_location'])) {
     $user_lat = $_SESSION['user_location']['lat'];
@@ -25,40 +26,41 @@ if (isset($_SESSION['user_id'])) {
     $stmt->close();
 }
 // Determine the tracking URL:
+// If the session contains a 'payerUrl' (set in track_order.php when redirected by the payment gateway),
+// use that URL; otherwise, use the default tracking page.
 $trackingUrl = "/user/track_order.php";
 if (isset($_SESSION['payerUrl']) && !empty($_SESSION['payerUrl'])) {
     $trackingUrl = $_SESSION['payerUrl'];
 }
-
-// Handle search query
-$search = "";
-if (isset($_GET['q'])) {
-    $search = trim($_GET['q']);
-}
 ?>
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <title>Food</title>
     <?php include 'inc/head.inc.php'; ?>
     <link rel="stylesheet" href="/css/index.css">
 </head>
+
 <body>
     <?php include 'inc/nav.inc.php'; ?>
     <main class="container">
+        
         <!-- Display Resume Tracking Button if an incomplete order exists -->
         <?php if ($trackingOrderId): ?>
+            <br>
             <div class="alert alert-info mt-3">
                 You have an ongoing order.
                 <a href="<?= htmlspecialchars($trackingUrl) ?>" class="btn btn-warning ms-2">Resume Tracking</a>
             </div>
         <?php endif; ?>
 
+
         <?php if (isset($_GET['require_login'])): ?>
             <div class="alert alert-danger">Please Log In to Continue</div>
         <?php endif; ?>
 
-        <!-- Enter Location Section -->
+        <!-- Enter Location -->
         <div class="row">
             <div class="col-md-4">
                 <div class="card mt-5 border border-5 rounded-5">
@@ -69,55 +71,36 @@ if (isset($_GET['q'])) {
                         <div class="form-group">
                             <input type="text" class="form-control" id="location" name="location"
                                 placeholder="Type an Address" onfocus="getUserLocation()" oninput="toggleSubmitButton()"
-                                <?php if (isset($_SESSION['user_location'])): ?> 
+                                <?php if (isset($_SESSION['user_location'])): ?>
                                     value="<?= htmlspecialchars($user_address) ?>" <?php endif; ?>>
                             <br>
+                            <!-- Warn user to enter location first -->
                             <?php if (isset($_GET['require_location'])): ?>
-                                <div class="alert alert-danger">Please enter a location first</div>
+                                <div class="alert alert-danger">
+                                    Please enter a location first
+                                </div>
                             <?php endif; ?>
                             <br>
-                            <button class="btn w-100 text-muted background-orange" id="location-button" onclick="sendToServer()">
+                            <button class="btn w-100 text-muted background-orange" id="location-button"
+                                onclick="sendToServer()">
                                 <strong>Search Restaurants</strong>
                             </button>
                         </div>
                     </div>
                 </div>
             </div>
-            <div class="col-md-8">
+            <div class="col-md-8 text-center">
                 <img src="/static/main-image2.png" class="mt-5 d-none d-md-block" alt="hero image" width="100%">
+                <h4>Satisfy your hunger and your wallet!<br><h6>Order food or deliver meals and make money on the go!</h6></h4>
             </div>
         </div>
-
         <hr>
-        <!-- Search Bar for Restaurants -->
-        <div class="row my-3">
-            <div class="col-md-12">
-                <form class="d-flex" method="get" action="">
-                    <input class="form-control me-2" type="search" placeholder="Search Restaurants by Name or First Letter" aria-label="Search" name="q" value="<?= htmlspecialchars($search) ?>">
-                    <button class="btn btn-outline-success" type="submit">Search</button>
-                </form>
-            </div>
-        </div>
-
         <h2>
             <a class="text-decoration-none text-muted" href="/user/restaurants.php">Restaurants Near You</a>
         </h2>
         <div class="row background-orange border rounded-4">
             <?php
-            // Prepare SQL to fetch restaurants, with a search filter if provided
-            $query = "SELECT idrestaurant, name, address, image FROM restaurant WHERE approval = 1";
-            $params = [];
-            $types = "";
-            if (!empty($search)) {
-                $query .= " AND name LIKE ?";
-                $params[] = $search . '%';
-                $types .= "s";
-            }
-            $query .= " ORDER BY name";
-            $stmt = $conn->prepare($query);
-            if (!empty($params)) {
-                $stmt->bind_param($types, ...$params);
-            }
+            $stmt = $conn->prepare("SELECT idrestaurant, name, address, image FROM restaurant WHERE approval = 1 ORDER BY name");
             $stmt->execute();
             $result = $stmt->get_result();
             $stmt->close();
@@ -127,7 +110,8 @@ if (isset($_GET['q'])) {
                 <div class="col-md-3 mt-3 mb-3 d-flex">
                     <a class="text-decoration-none w-100" href="/user/restaurant.php?id=<?= $row['idrestaurant'] ?>">
                         <div class="card restaurant h-100 d-flex flex-column">
-                            <img src="<?= htmlspecialchars($row['image']) ?>" class="card-img-top fixed-img" alt="store image">
+                            <img src="<?= htmlspecialchars($row['image']) ?>" class="card-img-top fixed-img"
+                                alt="store image">
                             <div class="card-body d-flex flex-column">
                                 <h3 class="card-title flex-grow-1"><?= htmlspecialchars($row['name']) ?></h3>
                             </div>
@@ -138,7 +122,7 @@ if (isset($_GET['q'])) {
         </div>
         <script>
             // Enable or disable the location button based on input value
-            if(document.getElementById("location").value){
+            if (document.getElementById("location").value) {
                 document.getElementById("location-button").disabled = false;
             } else {
                 document.getElementById("location-button").disabled = true;
@@ -147,4 +131,5 @@ if (isset($_GET['q'])) {
     </main>
     <?php include 'inc/footer.inc.php'; ?>
 </body>
+
 </html>

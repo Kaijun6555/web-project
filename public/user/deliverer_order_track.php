@@ -44,7 +44,7 @@ if ($current_status == 1) {
 }
 
 // Retrieve information about the order
-$stmt = $conn->prepare("SELECT idOrders, customer_user_id, order_address, restaurant_id, order_long, order_lat FROM Orders WHERE idOrders = ?");
+$stmt = $conn->prepare("SELECT idOrders, customer_user_id, order_address, restaurant_id, order_long, order_lat, DATE_FORMAT(created_at, '%Y-%m-%d %r') AS formatted_date FROM Orders WHERE idOrders = ?");
 $stmt->bind_param("i", $order_id);
 $stmt->execute();
 $order = $stmt->get_result();
@@ -54,6 +54,9 @@ if ($row = $order->fetch_assoc()) {  // Fetch order details
     $restaurant_id = $row['restaurant_id'];  // Get restaurant_id
     $order_long = $row['order_long'];
     $order_lat = $row['order_lat'];
+
+    $order_address = $row['order_address'];
+    $order_date = $row['formatted_date'];
 
     // Now fetch the longitude and latitude of the restaurant
     $stmt = $conn->prepare("SELECT `long`, lat, name FROM restaurant WHERE idrestaurant = ?");
@@ -105,16 +108,52 @@ if (!empty($user_id)) {
     <div class="container mt-4">
         <div class="row">
             <div class="col-md-6">
-                <div id="map" style="height:500px;"></div>
+                <div id="map"></div>
             </div>
-            <div class="col-md-6">
-                <h3>Order Status: <strong><span id="order-status">Order is being Prepared</span></strong></h3>
-                <button class="btn btn-success" id="order_collected_button" onclick="orderCollected()" disabled>Order Collected from Restaurant</button>
-                <button class="btn btn-success" id="order_completed_button" onclick="orderCompleted()" disabled>Order Completed</button>
+            <div class="col-md-6 rounded bg-light p-4">
+
+                <h5>Delivery Summary</h5>
+                <div class="card shadow-sm border-0">
+                    <div class="card-body">
+                        <p class="text-muted small mb-2"><?= $order_date ?></p>
+                        <div class="card background-orange text-white p-2">
+                            <ul class="list-group list-group-flush">
+                                <li class="list-group-item bg-transparent text-white small">
+                                    <strong>Deliver from</strong><br>
+                                    <?= $restaurant['name'] ?>
+                                </li>
+                                <li class="list-group-item bg-transparent text-white small">
+                                    <strong>To</strong><br>
+                                    <?= $order_address ?>
+                                </li>
+                            </ul>
+                        </div>
+                        <div class="mt-3">
+                            <div class="d-flex justify-content-between">
+                                <span>Delivery Fee</span>
+                                <strong>$1.99</strong>
+                            </div>
+                            <hr>
+                            <div class="d-flex justify-content-between text-success">
+                                <strong>Total amount receivable</strong>
+                                <strong>$1.99</strong>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <button class="btn btn-success w-100 mt-3" id="order_collected_button" onclick="orderCollected()"
+                    disabled>Order
+                    Collected from Restaurant</button>
+
+                <button class="btn btn-success w-100 mt-3" id="order_completed_button" onclick="orderCompleted()"
+                    disabled>Order
+                    Completed</button>
                 <a href="/user/chat_with_customer.php?order_id=<?= $order_id ?>" class="btn btn-outline-primary">
                     Chat with Customer
                 </a>
+
             </div>
+
             <!-- Order Completed Modal -->
             <div class="modal fade" id="orderCompleted" tabindex="-1" aria-labelledby="modalTitle" aria-hidden="true">
                 <div class="modal-dialog modal-lg">
@@ -130,16 +169,16 @@ if (!empty($user_id)) {
                                 <form id="paypalForm" method="post">
                                     <label for="paypalEmail">Enter PayPal Email:</label>
                                     <?php if (!empty($paypal_email)): ?>
-                                        <input type="email" id="paypalEmail" name="paypalEmail" value="<?= htmlspecialchars($paypal_email) ?>" class="form-control" readonly />
+                                        <input type="email" id="paypalEmail" name="paypalEmail"
+                                            value="<?= htmlspecialchars($paypal_email) ?>" class="form-control" readonly />
                                     <?php else: ?>
-                                        <input type="email" id="paypalEmail" name="paypalEmail" class="form-control" placeholder="Enter your PayPal email" required />
+                                        <input type="email" id="paypalEmail" name="paypalEmail" class="form-control"
+                                            placeholder="Enter your PayPal email" required />
                                     <?php endif; ?>
 
                                     <br><br>
                                     <button type="submit" class="btn btn-success">Confirm Email</button>
                                 </form>
-
-
                             </div>
 
                             <div class="col-lg-8 bg-light p-4 rounded">
@@ -155,7 +194,7 @@ if (!empty($user_id)) {
                                 <p class="text-muted small"><?= $restaurant['name'] ?></p>
 
                                 <div class="mt-3">
-                                    <div class="d-flex justify-content-between text-danger">
+                                    <div class="d-flex justify-content-between text-success">
                                         <span>Delivery Fee</span>
                                         <strong>$1.99</strong>
                                     </div>
@@ -212,13 +251,13 @@ if (!empty($user_id)) {
         function updateMap(status, delivery_long, delivery_lat) {
             if ((status === "Order is being Prepared" || status === "Rider Pickup")) {
 
-                if(status === "Rider Pickup"){
+                if (status === "Rider Pickup") {
                     document.getElementById('order_collected_button').disabled = false;
                 }
 
                 marker.setMap(null);
                 directionsRenderer.setMap(map);
-                
+
 
                 // Delivery Rider Live Location
                 var start = {
@@ -346,7 +385,7 @@ if (!empty($user_id)) {
                     alert("Payment has been made to your email! Thank you for delivering with us.");
                     setTimeout(() => {
                         window.location.href = "/";
-                    }, 500); 
+                    }, 500);
                 })
                 .catch(error => {
                     console.error('Error:', error);
@@ -361,7 +400,7 @@ if (!empty($user_id)) {
                 .then(response => response.json())
                 .then(data => {
                     if (data.status != "Order is delivered") {
-                        document.getElementById('order-status').innerText = data.status;
+                        // document.getElementById('order-status').innerText = data.status;
                         if (data.delivery_long && data.delivery_lat) {
                             updateMap(data.status, data.delivery_long, data.delivery_lat);
                         }

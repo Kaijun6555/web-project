@@ -80,11 +80,11 @@ $cancel_url = "https://www.foodfinder.shop/";
                     </div>
                     <div class="col-12 mt-2">
                         <label class="form-label">Address details (Floor, Unit, Building)</label>
-                        <input type="text" class="form-control" value="">
+                        <input type="text" class="form-control" id="address_details" name="address_details" value="">
                     </div>
                     <div class="col-12 mt-2">
                         <label class="form-label">Note to delivery rider</label>
-                        <input type="text" class="form-control" placeholder="e.g. Meet me at the lobby">
+                        <input type="text" class="form-control" name="rider_note" placeholder="e.g. Meet me at the lobby">
                     </div>
                 </div>
             </div>

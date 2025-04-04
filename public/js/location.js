@@ -32,6 +32,7 @@ async function getReadableAddress(lat, lng) {
 
 // Convert on server side when user manually enters
 async function convertAddressToLatLng() {
+
     let address = document.getElementById("location").value;
 
     if (!address) return alert("Please enter an address");
@@ -148,7 +149,7 @@ function SaveDeliveryRiderLocation(order) {
     navigator.geolocation.getCurrentPosition(
         (position) => {
             let lat = position.coords.latitude;
-            let lng =  position.coords.longitude;
+            let lng = position.coords.longitude;
             // Store Delivery Rider's Current Location
             fetch('/requests/process_deliverer_location.php', {
                 method: 'POST',
@@ -168,27 +169,17 @@ function SaveDeliveryRiderLocation(order) {
 }
 
 
-// Convert on server side when user manually enters
-async function submitRestaurant() {
-    let address = document.getElementById("address").value;
+async function handleInput(event) {
+    const userInput = event.target.value;
+    const restaurant_lng = document.getElementById("restaurant_lng");
+    const restaurant_lat = document.getElementById("restaurant_lat");
 
-    if (!address) return alert("Please enter an address");
+    if (userInput.trim !== "") {
+        if (userInput.length > 15) {
+            const result = await convertAddressToLatLng();
+            restaurant_lat.value = result[0];
+            restaurant_lng.value = result[1];
+        }
 
-    const url = `https://maps.googleapis.com/maps/api/geocode/json?address=${encodeURIComponent(address)}&key=${API_KEY}`;
-    let response = await fetch(url);
-    let data = await response.json();
-
-    if (data.status === "OK") {
-        let location = data.results[0].geometry.location;
-        let [lat, lng] = [location.lat, location.lng];
-        document.getElementById('restaurant_lat').value = lat;
-        document.getElementById('restaurant_lng').value = lng;
-
-        var form = document.getElementById("merchant_form");
-
-        form.submit();
-
-    } else {
-        alert("Error found");
     }
 }

@@ -59,7 +59,16 @@
 .step-circle.active {
     background-color: red;
 }
+
 .custom-size {
     width: 5vw;
     height: 5vw;
+}
+
+#map {
+    height: 500px;
+}
+
+.orange-text {
+    color:#FF7E14;
 }

@@ -90,6 +90,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                 </div>
                 <button type="submit" class="btn btn-primary">Login</button>
             </form>
+        <a href='/restaurant/restaurant_register.php'>Register Your Merchant Here!</a>
         </div>
     </main>
     <?php include '../inc/footer.inc.php'; ?>
