@@ -16,16 +16,12 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $openinghours = sanitize_input($_POST['opening_hours']);
     $address = sanitize_input($_POST['location']);
 
-    $lon = sanitize_input($_POST['restaurant_lon']);
+    $lon = sanitize_input($_POST['restaurant_lng']);
     $lat = sanitize_input($_POST['restaurant_lat']);
 
     $verification_file_tmp_path = $_FILES['verification']['tmp_name'];
     $verification_file_name = $_FILES['verification']['name'];
     $verification_file_size = $_FILES['verification']['size'];
-
-    $restaurant_lon = sanitize_input($_POST['restaurant_lng']);
-
-    $restaurant_lat = sanitize_input($_POST['restaurant_lat']);
 
     $target_directory = "verification/";
 
@@ -83,7 +79,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         } else {
             // Insert new user
             $stmt = $conn->prepare("INSERT INTO restaurant (name, email, address, image, verification, password, `long`, lat) VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
-            $stmt->bind_param("ssssss", $name, $email, $address, $verification_image_file_path, $verification_file_path, $hashed_password, $lon, $lat);
+            $stmt->bind_param("ssssssdd", $name, $email, $address, $verification_image_file_path, $verification_file_path, $hashed_password, $lon, $lat);
 
             if ($stmt->execute()) {
                 header("Location: restaurant_login.php?register_success=1");
@@ -124,7 +120,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                 </div>
                 <div class="mb-3">
                     <label for="address">Merchant Address</label>
-                    <input type="text" name="address" id="address" class="form-control" required>
+                    <input type="text" name="location" id="location" class="form-control" oninput="handleInput(event)" required>
                 </div>
                 <div class="mb-3">
                     <label for="opening_hours">Merchant Opening Hours</label>
@@ -150,7 +146,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                 <input type="hidden" name="restaurant_lng" id="restaurant_lng"  required>
                 <input type="hidden" name="restaurant_lat" id="restaurant_lat"  required>
 
-                <button type="button" class="btn btn-primary" onclick="submitRestaurant">Register</button>
+                <button type="submit" class="btn btn-primary">Register</button>
             </form>
         </div>
     </main>

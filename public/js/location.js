@@ -32,7 +32,7 @@ async function getReadableAddress(lat, lng) {
 
 // Convert on server side when user manually enters
 async function convertAddressToLatLng() {
-    
+
     let address = document.getElementById("location").value;
 
     if (!address) return alert("Please enter an address");
@@ -169,18 +169,17 @@ function SaveDeliveryRiderLocation(order) {
 }
 
 
-
-
 async function handleInput(event) {
     const userInput = event.target.value;
     const restaurant_lng = document.getElementById("restaurant_lng");
     const restaurant_lat = document.getElementById("restaurant_lat");
 
     if (userInput.trim !== "") {
-        if (userInput.length > 5) {
+        if (userInput.length > 15) {
             const result = await convertAddressToLatLng();
             restaurant_lat.value = result[0];
             restaurant_lng.value = result[1];
         }
+
     }
 }

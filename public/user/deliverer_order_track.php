@@ -151,6 +151,7 @@ if (!empty($user_id)) {
                 <a href="/user/chat_with_customer.php?order_id=<?= $order_id ?>" class="btn btn-outline-primary">
                     Chat with Customer
                 </a>
+
             </div>
 
             <!-- Order Completed Modal -->
