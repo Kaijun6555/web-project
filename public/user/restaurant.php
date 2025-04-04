@@ -123,10 +123,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST["menu_id"])) {
                                 </button>
                             </div>
                         </div>
-                        <div class="offcanvas offcanvas-end" tabindex="-1" id="foodDetail<?= $menu_item['idmenu_item'] ?>">
+                        <div class="offcanvas offcanvas-end" tabindex="-1" id="foodDetail<?= $menu_item['idmenu_item'] ?>" aria-label="offcanvasLabel">
                             <div class="offcanvas-header">
                                 <h3 class="offcanvas-title"><?= htmlspecialchars($menu_item['itemName']) ?></h3>
-                                <button type="button" class="btn-close" data-bs-dismiss="offcanvas"></button>
+                                <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="close"></button>
                             </div>
                             <div class="offcanvas-body">
                                 <p>Customize your meal by selecting options below:</p>
@@ -151,7 +151,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST["menu_id"])) {
                                     <button type="button" class="btn btn-outline-secondary" onclick="changeQuantity('qty<?= $menu_item['idmenu_item'] ?>', -1)">-</button>
                                     <input type="number" class="form-control text-center mx-2" name="quantity" id="qty<?= $menu_item['idmenu_item'] ?>"
                                         value="1" min="1" style="max-width: 80px;"
-                                        oninput="updateButtonPrice(<?= $menu_item['idmenu_item'] ?>, <?= $menu_item['price'] ?>)">
+                                        oninput="updateButtonPrice(<?= $menu_item['idmenu_item'] ?>, <?= $menu_item['price'] ?>)" aria-label="QTY">
                                     <button type="button" class="btn btn-outline-secondary" onclick="changeQuantity('qty<?= $menu_item['idmenu_item'] ?>', 1)">+</button>
                                 </div>
 
