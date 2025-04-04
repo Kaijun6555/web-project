@@ -64,39 +64,46 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 ?>
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <title>Food</title>
     <?php include '../inc/head.inc.php'; ?>
 </head>
+
 <body>
     <?php include '../inc/nav.inc.php'; ?>
-
-    <div class="container mt-4">
-        <h2>Register</h2>
-        <?php if (isset($error)): ?>
-            <div class="alert alert-danger"><?= htmlspecialchars($error) ?></div>
-        <?php endif; ?>
-        <form method="POST">
-            <div class="mb-3">
-                <label>Name</label>
-                <input type="text" name="name" class="form-control" required>
-            </div>
-            <div class="mb-3">
-                <label>Email</label>
-                <input type="email" name="email" class="form-control" required>
-            </div>
-            <div class="mb-3">
-                <label>Password</label>
-                <input type="password" name="password" class="form-control" required>
-            </div>
-            <div class="mb-3">
-                <label>Confirm Password</label>
-                <input type="password" name="confirm_password" class="form-control" required>
-            </div>
-            <button type="submit" class="btn btn-primary">Register</button>
-        </form>
-    </div>
-
+    <main>
+        <div class="container mt-4">
+            <h1>Register</h1>
+            <?php if (isset($error)): ?>
+                <div class="alert alert-danger"><?= htmlspecialchars($error) ?></div>
+            <?php endif; ?>
+            <form method="POST">
+                <div class="mb-3">
+                    <label for="name">Name</label>
+                        <input type="text" name="name" id="name" class="form-control" required>
+                    
+                </div>
+                <div class="mb-3">
+                    <label for="email">Email</label>
+                        <input type="email" name="email" id="email" class="form-control" required>
+                    
+                </div>
+                <div class="mb-3">
+                    <label for="password">Password</label>
+                        <input type="password" name="password" id="password" class="form-control" required>
+                    
+                </div>
+                <div class="mb-3">
+                    <label for="confirm_password">Confirm Password</label>
+                        <input type="password" name="confirm_password" id="confirm_password" class="form-control" required>
+                    
+                </div>
+                <button type="submit" class="btn btn-primary">Register</button>
+            </form>
+        </div>
+    </main>
     <?php include '../inc/footer.inc.php'; ?>
 </body>
+
 </html>

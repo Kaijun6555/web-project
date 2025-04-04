@@ -14,7 +14,7 @@ if (!$_SESSION['restaurant_id'] == null) {
 $id = $_SESSION['restaurant_id'];
 
 // Get restaurant details
-$stmt = $conn->prepare("SELECT paypal_email FROM restaurant WHERE idrestaurant = ?");
+$stmt = $conn->prepare("SELECT name, paypal_email FROM restaurant WHERE idrestaurant = ?");
 $stmt->bind_param("i", $id);
 $stmt->execute();
 $result = $stmt->get_result();
@@ -23,6 +23,8 @@ $stmt->close();
 
 // Retrieve value for paypal email
 $restaurant_paypal_email = $restaurant['paypal_email'];
+$restaurant_name = $restaurant['name'];
+$_SESSION['restaurant_name'] = $restaurant_name;
 
 // Fetch all orders for restaurant
 $stmt = $conn->prepare("SELECT idOrders, total_price, created_at FROM Orders WHERE restaurant_id = ? AND status = ? ORDER BY created_at");

@@ -17,6 +17,7 @@ if (isset($_SESSION['user_location'])) {
 // Check if User is logged in
 if (isset($_SESSION['user_id'])) {
     $user_id = $_SESSION['user_id'];
+    $_SESSION['driver_id'] = $user_id;
 }
 
 if (!isset($_GET['order_id'])) {
@@ -147,6 +148,9 @@ if (!empty($user_id)) {
                 <button class="btn btn-success w-100 mt-3" id="order_completed_button" onclick="orderCompleted()"
                     disabled>Order
                     Completed</button>
+                <a href="/user/chat_with_customer.php?order_id=<?= $order_id ?>" class="btn btn-outline-primary">
+                    Chat with Customer
+                </a>
             </div>
 
             <!-- Order Completed Modal -->

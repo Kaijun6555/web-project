@@ -1,5 +1,5 @@
 <?php
-require 'db-connect.php';
+require '../../db/db-connect.php';
 
 $order_id = isset($_GET['order_id']) ? (int) $_GET['order_id'] : 0;
 if ($order_id <= 0) exit;

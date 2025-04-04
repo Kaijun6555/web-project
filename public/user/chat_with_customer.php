@@ -4,38 +4,42 @@ require '../../db/db-connect.php';
 
 // Initialize variables
 $error_message = null;
-$order_id = isset($_GET['order_id']) ? (int) $_GET['order_id'] : 0;
+$driver_id = $_SESSION['driver_id'] ?? null;
+
+// Check if driver is logged in
+if (!$driver_id) {
+    $error_message = "Access denied. Please log in as a driver.";
+}
 
 // Validate order ID
-if ($order_id <= 0) {
+$order_id = isset($_GET['order_id']) ? (int) $_GET['order_id'] : 0;
+if (!$error_message && $order_id <= 0) {
     $error_message = "Invalid order ID.";
 }
 
-// Fetch driver info for the order
+// Check driver assigned to order
 if (!$error_message) {
-    $stmt = $conn->prepare("SELECT delivery_user_id FROM Orders WHERE idOrders = ?");
-    $stmt->bind_param("i", $order_id);
+    $stmt = $conn->prepare("SELECT customer_user_id FROM Orders WHERE idOrders = ? AND delivery_user_id = ?");
+    $stmt->bind_param("ii", $order_id, $driver_id);
     $stmt->execute();
     $result = $stmt->get_result();
     $order = $result->fetch_assoc();
     $stmt->close();
 
-    if (!$order || !$order['delivery_user_id']) {
-        $error_message = "No driver assigned to this order yet.";
-    } else {
-        $delivery_user_id = $order['delivery_user_id'];
+    if (!$order || !$order['customer_user_id']) {
+        $error_message = "You're not assigned to this order, or no customer found.";
     }
 }
 ?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <title>Chat with Driver</title>
+    <title>Chat with Customer</title>
     <?php include '../inc/head.inc.php'; ?>
 </head>
-
 <body>
     <?php include '../inc/nav.inc.php'; ?>
+
     <div class="container mt-4">
         <?php if ($error_message): ?>
             <div class="alert alert-danger">
@@ -45,7 +49,7 @@ if (!$error_message) {
                 <button onclick="history.back()" class="btn btn-secondary">Go Back</button>
             </div>
         <?php else: ?>
-            <h2>Chat with Your Driver</h2>
+            <h2>Chat with Customer</h2>
             <div id="chat-box" class="chat-box border p-3 mb-3" style="height: 300px; overflow-y: scroll;">
                 <!-- Chat messages will be loaded here dynamically -->
             </div>
@@ -87,7 +91,7 @@ if (!$error_message) {
             headers: {
                 "Content-Type": "application/x-www-form-urlencoded"
             },
-            body: `order_id=<?= $order_id ?>&message=${encodeURIComponent(message)}&sender=customer`
+            body: `order_id=<?= $order_id ?>&message=${encodeURIComponent(message)}&sender=driver`
         }).then(response => {
             document.getElementById("chat-message").value = "";
             loadChat();

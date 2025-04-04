@@ -13,6 +13,7 @@ function sanitize_input($data)
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $name = sanitize_input($_POST['name']);
     $email = sanitize_input($_POST['email']);
+    $openinghours = sanitize_input($_POST['opening_hours']);
     $address = sanitize_input($_POST['location']);
 
     $lon = sanitize_input($_POST['restaurant_lon']);
@@ -22,39 +23,37 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $verification_file_name = $_FILES['verification']['name'];
     $verification_file_size = $_FILES['verification']['size'];
 
-    $verification_image_file_tmp_path = $_FILES['verification_image']['tmp_name'];
-    $verification_image_file_name = $_FILES['verification_image']['name'];
-    $verification_image_file_size = $_FILES['verification_image']['size'];
+    $restaurant_lon = sanitize_input($_POST['restaurant_lng']);
+
+    $restaurant_lat = sanitize_input($_POST['restaurant_lat']);
 
     $target_directory = "verification/";
 
-    $verification_image_file_path = $target_directory . basename($verification_image_file_name);
+    $image = $_POST['image'];
+    $image_data = getimagesize($image);
+
     $verification_file_path = $target_directory . basename($verification_file_name);
-    $verification_image_file_type = strtolower(pathinfo($verification_image_file_path, PATHINFO_EXTENSION));
     $verification_file_type = strtolower(pathinfo($verification_file_path, PATHINFO_EXTENSION));
-    if ($verification_image_file_size > 300000) {
-        echo "Sorry, your image file is too large";
+    if ($verification_file_size > 300000) {
+        echo "Sorry, your doc or pdf file is too large";
         exit();
     }
-    if (
-        $verification_image_file_type != "jpg" && $verification_image_file_type != "png" && $verification_image_file_type != "jpeg"
-    ) {
-        echo "Sorry, only JPG, JPEG, PNG files are allowed.";
-        exit();
+    if (!strpos($image_data['mime'], 'image/') === 0) {
+        header("Location: /restaurant/restaurant_register.php");
+        echo "
+        Provide a link to an image file online.
+        ";
     }
     if (
-        $verification_file_type != "pdf" && $verification_file_type != "doc"
+        $verification_file_type != "pdf" && $verification_file_type != "docx"
     ) {
         echo "Sorry, only pdf, doc files are allowed.";
         exit();
     }
     if (!is_dir($target_directory)) {
-        mkdir($target_directory, 0777, true);
+        mkdir($target_directory, 0775, true);
     }
-    if (is_dir($target_directory)) {
-        chmod($target_directory, 0775);
-    }
-    if (!move_uploaded_file($verification_image_file_tmp_path, $verification_image_file_path) && !move_uploaded_file($verification_file_tmp_path, $verification_file_path)) {
+    if (!move_uploaded_file($verification_file_tmp_path, $verification_file_path)) {
         echo "Sorry, there was an error uploading your file.";
         exit();
     }
@@ -108,48 +107,53 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
 <body>
     <?php include '../inc/nav.inc.php'; ?>
-    <div class="container mt-4">
-        <h2>Register as a Merchant With Us!</h2>
-        <?php if (isset($error)): ?>
-            <div class="alert alert-danger"> <?= $error ?> </div>
-        <?php endif; ?>
-        <form method="POST" enctype="multipart/form-data">
-            <div class="mb-3">
-                <label>Merchant Name</label>
-                <input type="text" name="name" class="form-control" required>
-            </div>
-            <div class="mb-3">
-                <label>Merchant Email</label>
-                <input type="email" name="email" class="form-control" required>
-            </div>
-            <div class="mb-3">
-                <label>Merchant Address</label>
-                <input type="text" name="location" class="form-control" oninput="handleInput(event)" required>
-            </div>
-            <div class="mb-3">
-                <label>Please Provide Link to an image </label>
-                <input type="text" name="image" class="form-control">
-            </div>
-            <div class="mb-3">
-                <label>Verification: Please Submit an .pdf or .doc file</label>
-                <input type="file" name="verification" class="form-control">
-            </div>
-            <div class="mb-3">
-                <label>Password</label>
-                <input type="password" name="password" class="form-control" required>
-            </div>
-            <div class="mb-3">
-                <label>Confirm Password</label>
-                <input type="password" name="confirm_password" class="form-control" required>
-            </div>
+    <main>
+        <div class="container mt-4">
+            <h1>Register as a Merchant With Us!</h1>
+            <?php if (isset($error)): ?>
+                <div class="alert alert-danger"> <?= $error ?> </div>
+            <?php endif; ?>
+            <form method="POST" id="merchant_form" enctype="multipart/form-data">
+                <div class="mb-3">
+                    <label for="name">Merchant Name</label>
+                    <input type="text" name="name" id="name" class="form-control" required>
+                </div>
+                <div class="mb-3">
+                    <label for="email">Merchant Email</label>
+                    <input type="email" name="email" id="email" class="form-control" required>
+                </div>
+                <div class="mb-3">
+                    <label for="address">Merchant Address</label>
+                    <input type="text" name="address" id="address" class="form-control" required>
+                </div>
+                <div class="mb-3">
+                    <label for="opening_hours">Merchant Opening Hours</label>
+                    <input type="text" name="opening_hours" id="opening_hours" class="form-control" required>
+                </div>
+                <div class="mb-3">
+                    <label for="image">Please Provide a link to an image </label>
+                    <input type="text" name="image" id="image" class="form-control" required>
+                </div>
+                <div class="mb-3">
+                    <label for="verification">Verification: Please Submit an .pdf or .doc file</label>
+                    <input type="file" name="verification" id="verification" class="form-control" required>
+                </div>
+                <div class="mb-3">
+                    <label for="password">Password</label>
+                    <input type="password" name="password" id="password" class="form-control" required>
+                </div>
+                <div class="mb-3">
+                    <label for="confirm_password">Confirm Password</label>
+                    <input type="password" name="confirm_password" id="confirm_password" class="form-control" required>
+                </div>
 
-            <input type="hidden" name="restaurant_lon" class="form-control" required>
-            <input type="hidden" name="restaurant_lat" class="form-control" required>
+                <input type="hidden" name="restaurant_lng" id="restaurant_lng"  required>
+                <input type="hidden" name="restaurant_lat" id="restaurant_lat"  required>
 
-            <button type="submit" class="btn btn-primary">Register</button>
-        </form>
-    </div>
-
+                <button type="button" class="btn btn-primary" onclick="submitRestaurant">Register</button>
+            </form>
+        </div>
+    </main>
     <?php include '../inc/footer.inc.php'; ?>
 </body>
 
