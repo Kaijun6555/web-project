@@ -31,20 +31,16 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST["remove_id"])) {
 
                 <!-- New About Button for All Users -->
                 <li class="nav-item me-3">
-                    <button class="btn navbar-button">
-                        <a class="text-black text-decoration-none" href="/aboutus.php">
+                        <a class="btn navbar-button text-black text-decoration-none" href="/aboutus.php">
                             About
                         </a>
-                    </button>
                 </li>
 
                 <?php if (empty($_SESSION['user_id'])): ?>
                     <li class="nav-item me-3">
-                        <button class="btn navbar-button">
-                            <a class="text-black text-decoration-none" href="/restaurant/restaurant_login.php">
+                            <a class="btn navbar-button text-black text-decoration-none" href="/restaurant/restaurant_login.php">
                                 Merchant Centre
                             </a>
-                        </button>
                     </li>
                 <?php endif; ?>
 
@@ -75,11 +71,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST["remove_id"])) {
                     </li>
                 <?php else: ?>
                     <li class="nav-item me-3">
-                        <button class="btn navbar-button">
-                            <a class="text-black text-decoration-none" href="/user/login.php">
+                        
+                            <a class="btn navbar-button text-black text-decoration-none" href="/user/login.php">
                                 <i class="bi bi-person-circle"></i>&nbsp;Login/Register
                             </a>
-                        </button>
                     </li>
                 <?php endif; ?>
                 <li class="nav-item me-3">
