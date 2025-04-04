@@ -9,11 +9,6 @@
                     <i class="fs-4 bi-house"></i> <span class="ms-1 d-none d-sm-inline">Dashboard</span>
                 </a>
             </li>
-            <li>
-                <a href="#" class="nav-link px-0 align-middle">
-                    <i class="fs-4 bi-table"></i> <span class="ms-1 d-none d-sm-inline">Orders</span></a>
-            </li>
-
             <li class="nav-item">
                 <a href="/restaurant/products.php" class="nav-link align-middle px-0">
                     <i class="fs-4 bi bi-shop"></i> <span class="ms-1 d-none d-sm-inline">Food Menu</span>

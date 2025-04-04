@@ -76,111 +76,112 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST["menu_id"])) {
 
 <body>
     <?php include '../inc/nav.inc.php'; ?>
-    <div class="container mt-4">
-        <div class="row">
-            <div class="col-md-4">
-                <input type="text" class="form-control" id="location" name="location" placeholder="Type an Address"
-                    onfocus="getUserLocation()" oninput="toggleSubmitButton()" value="<?= $user_address ?>">
+    <main>
+        <div class="container mt-4">
+            <div class="row">
+                <div class="col-md-4">
+                    <input type="text" class="form-control" id="location" name="location" placeholder="Type an Address"
+                        onfocus="getUserLocation()" oninput="toggleSubmitButton()" value="<?= $user_address ?>">
+                </div>
+                <div class="col-md-2">
+                    <button class="btn text-muted background-orange" id="location-button" onclick="saveLocation()" disabled>
+                        <strong>Confirm Address</strong>
+                    </button>
+                </div>
             </div>
-            <div class="col-md-2">
-                <button class="btn text-muted background-orange" id="location-button" onclick="saveLocation()" disabled>
-                    <strong>Confirm Address</strong>
-                </button>
-            </div>
-        </div>
 
-        <br>
+            <br>
 
-        <!-- Navigation -->
-        <p>
-            <a href="/">Home</a>
-            <i class="bi bi-arrow-right-short"></i>
-            <a href="restaurants.php">Restaurants</a>
-            <i class="bi bi-arrow-right-short"></i>
-            <?= htmlspecialchars($restaurant['name']) ?>
-        </p>
+            <!-- Navigation -->
+            <p>
+                <a href="/">Home</a>
+                <i class="bi bi-arrow-right-short"></i>
+                <a href="restaurants.php">Restaurants</a>
+                <i class="bi bi-arrow-right-short"></i>
+                <?= htmlspecialchars($restaurant['name']) ?>
+            </p>
 
-        <h2><?= htmlspecialchars($restaurant['name']) ?></h2>
-        <p><strong>Address:</strong> <?= htmlspecialchars($restaurant['address']) ?></p>
-        <h3 class="mt-4">Menu</h3>
-        <!-- Show Cart Success Message -->
-        <?php if (isset($_GET['cart_success'])): ?>
-            <div class="alert alert-success mt-3">Item added to cart!</div>
-        <?php endif; ?>
-        <?php if ($menu_result->num_rows > 0): ?>
-            <div class="row card-deck">
-                <?php while ($menu_item = $menu_result->fetch_assoc()): ?>
-                    <div class="card col-md-4">
-                        <img class="card-img-top" src="<?= htmlspecialchars($menu_item['image']) ?>" alt="Image of menu item">
-                        <div class="card-body">
-                            <h5 class="card-title"><?= htmlspecialchars($menu_item['itemName']) ?></h5>
-                            <p class="card-text"><?= nl2br(htmlspecialchars($menu_item['description'])) ?></p>
-                            <span class="text-success">$<?= number_format($menu_item['price'], 2) ?></span>
-                            <button class="btn btn-success rounded-circle" data-bs-toggle="offcanvas"
-                                data-bs-target="#foodDetail<?= $menu_item['idmenu_item'] ?>">
-                                <i class="bi bi-plus"></i>
-                            </button>
-                        </div>
-                    </div>
-                    <div class="offcanvas offcanvas-end" tabindex="-1" id="foodDetail<?= $menu_item['idmenu_item'] ?>">
-                        <div class="offcanvas-header">
-                            <h5 class="offcanvas-title"><?= htmlspecialchars($menu_item['itemName']) ?></h5>
-                            <button type="button" class="btn-close" data-bs-dismiss="offcanvas"></button>
-                        </div>
-                        <div class="offcanvas-body">
-                            <p>Customize your meal by selecting options below:</p>
-                            <h6>Choice of Sauce</h6>
-                            <div class="form-check">
-                                <input class="form-check-input" type="radio" name="sauce" id="sauce1">
-                                <label class="form-check-label" for="sauce1">Curry Sauce</label>
-                            </div>
-                            <div class="form-check">
-                                <input class="form-check-input" type="radio" name="sauce" id="sauce2">
-                                <label class="form-check-label" for="sauce2">BBQ Sauce</label>
-                            </div>
-
-                            <h6 class="mt-3">Sides</h6>
-                            <div class="form-check">
-                                <input class="form-check-input" type="checkbox" id="fries">
-                                <label class="form-check-label" for="fries">French Fries (L)</label>
-                            </div>
-
-                            <!-- Quantity and Add to Basket Button -->
-                            <div class="d-flex align-items-center mt-4">
-                                <button type="button" class="btn btn-outline-secondary" onclick="changeQuantity('qty<?= $menu_item['idmenu_item'] ?>', -1)">-</button>
-                                <input type="number" class="form-control text-center mx-2" name="quantity" id="qty<?= $menu_item['idmenu_item'] ?>"
-                                    value="1" min="1" style="max-width: 80px;"
-                                    oninput="updateButtonPrice(<?= $menu_item['idmenu_item'] ?>, <?= $menu_item['price'] ?>)">
-                                <button type="button" class="btn btn-outline-secondary" onclick="changeQuantity('qty<?= $menu_item['idmenu_item'] ?>', 1)">+</button>
-                            </div>
-
-                            <!-- Add to Cart Form -->
-                            <form method="POST" class="d-inline mt-3">
-                                <input type="hidden" name="menu_id" value="<?= $menu_item['idmenu_item'] ?>">
-                                <input type="hidden" name="menu_image" value="<?= $menu_item['image'] ?>">
-                                <input type="hidden" name="menu_name" value="<?= htmlspecialchars($menu_item['itemName']) ?>">
-                                <input type="hidden" name="menu_price" value="<?= $menu_item['price'] ?>">
-                                <input type="hidden" name="restaurant_id" value="<?= $menu_item['restaurant_id'] ?>">
-                                <input type="hidden" name="quantity" id="formQty<?= $menu_item['idmenu_item'] ?>" value="1">
-                                <button
-                                    class="btn btn-success w-100 mt-3"
-                                    type="submit"
-                                    id="addBtn<?= $menu_item['idmenu_item'] ?>"
-                                    data-base-price="<?= $menu_item['price'] ?>"
-                                    onclick="syncQuantityBeforeSubmit('qty<?= $menu_item['idmenu_item'] ?>', 'formQty<?= $menu_item['idmenu_item'] ?>')">
-                                    Add to Basket - $<?= number_format($menu_item['price'], 2) ?>
+            <h1><?= htmlspecialchars($restaurant['name']) ?></h1>
+            <p><strong>Address:</strong> <?= htmlspecialchars($restaurant['address']) ?></p>
+            <h2 class="mt-4">Menu</h2>
+            <!-- Show Cart Success Message -->
+            <?php if (isset($_GET['cart_success'])): ?>
+                <div class="alert alert-success mt-3">Item added to cart!</div>
+            <?php endif; ?>
+            <?php if ($menu_result->num_rows > 0): ?>
+                <div class="row card-deck">
+                    <?php while ($menu_item = $menu_result->fetch_assoc()): ?>
+                        <div class="card col-md-4">
+                            <img class="card-img-top" src="<?= htmlspecialchars($menu_item['image']) ?>" alt="Image of menu item">
+                            <div class="card-body">
+                                <h3 class="card-title"><?= htmlspecialchars($menu_item['itemName']) ?></h3>
+                                <p class="card-text"><?= nl2br(htmlspecialchars($menu_item['description'])) ?></p>
+                                <span class="text-success">$<?= number_format($menu_item['price'], 2) ?></span>
+                                <button class="btn btn-success rounded-circle" data-bs-toggle="offcanvas" aria-label="Add item"
+                                    data-bs-target="#foodDetail<?= $menu_item['idmenu_item'] ?>">
+                                    <i class="bi bi-plus"></i>
                                 </button>
-
-                            </form>
+                            </div>
                         </div>
-                    </div>
-                <?php endwhile; ?>
-            </div>
-        <?php else: ?>
-            <p>No menu items available.</p>
-        <?php endif; ?>
-    </div>
+                        <div class="offcanvas offcanvas-end" tabindex="-1" id="foodDetail<?= $menu_item['idmenu_item'] ?>">
+                            <div class="offcanvas-header">
+                                <h3 class="offcanvas-title"><?= htmlspecialchars($menu_item['itemName']) ?></h3>
+                                <button type="button" class="btn-close" data-bs-dismiss="offcanvas"></button>
+                            </div>
+                            <div class="offcanvas-body">
+                                <p>Customize your meal by selecting options below:</p>
+                                <h4>Choice of Sauce</h4>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="radio" name="sauce" id="sauce1">
+                                    <label class="form-check-label" for="sauce1">Curry Sauce</label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="radio" name="sauce" id="sauce2">
+                                    <label class="form-check-label" for="sauce2">BBQ Sauce</label>
+                                </div>
 
+                                <h4 class="mt-3">Sides</h4>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" id="fries">
+                                    <label class="form-check-label" for="fries">French Fries (L)</label>
+                                </div>
+
+                                <!-- Quantity and Add to Basket Button -->
+                                <div class="d-flex align-items-center mt-4">
+                                    <button type="button" class="btn btn-outline-secondary" onclick="changeQuantity('qty<?= $menu_item['idmenu_item'] ?>', -1)">-</button>
+                                    <input type="number" class="form-control text-center mx-2" name="quantity" id="qty<?= $menu_item['idmenu_item'] ?>"
+                                        value="1" min="1" style="max-width: 80px;"
+                                        oninput="updateButtonPrice(<?= $menu_item['idmenu_item'] ?>, <?= $menu_item['price'] ?>)">
+                                    <button type="button" class="btn btn-outline-secondary" onclick="changeQuantity('qty<?= $menu_item['idmenu_item'] ?>', 1)">+</button>
+                                </div>
+
+                                <!-- Add to Cart Form -->
+                                <form method="POST" class="d-inline mt-3">
+                                    <input type="hidden" name="menu_id" value="<?= $menu_item['idmenu_item'] ?>">
+                                    <input type="hidden" name="menu_image" value="<?= $menu_item['image'] ?>">
+                                    <input type="hidden" name="menu_name" value="<?= htmlspecialchars($menu_item['itemName']) ?>">
+                                    <input type="hidden" name="menu_price" value="<?= $menu_item['price'] ?>">
+                                    <input type="hidden" name="restaurant_id" value="<?= $menu_item['restaurant_id'] ?>">
+                                    <input type="hidden" name="quantity" id="formQty<?= $menu_item['idmenu_item'] ?>" value="1">
+                                    <button
+                                        class="btn btn-success w-100 mt-3"
+                                        type="submit"
+                                        id="addBtn<?= $menu_item['idmenu_item'] ?>"
+                                        data-base-price="<?= $menu_item['price'] ?>"
+                                        onclick="syncQuantityBeforeSubmit('qty<?= $menu_item['idmenu_item'] ?>', 'formQty<?= $menu_item['idmenu_item'] ?>')">
+                                        Add to Basket - $<?= number_format($menu_item['price'], 2) ?>
+                                    </button>
+
+                                </form>
+                            </div>
+                        </div>
+                    <?php endwhile; ?>
+                </div>
+            <?php else: ?>
+                <p>No menu items available.</p>
+            <?php endif; ?>
+        </div>
+    </main>
     <?php include '../inc/footer.inc.php'; ?>
     <script>
         function changeQuantity(inputId, delta) {
