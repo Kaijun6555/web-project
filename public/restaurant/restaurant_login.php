@@ -51,7 +51,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         }
         $stmt->close();
     }
-}?>
+} ?>
 <!DOCTYPE html>
 <html lang="en">
 
@@ -62,34 +62,36 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
 <body>
     <?php include '../inc/nav.inc.php'; ?>
+    <main>
+        <div class="container mt-4">
+            <h1>Merchant Login</h1>
+            <?php if (isset($_GET['register_success'])): ?>
+                <div class="alert alert-success">Registration successful! Please log in.</div>
+            <?php endif; ?>
 
-    <div class="container mt-4">
-        <h2>Merchant Login</h2>
-        <?php if (isset($_GET['register_success'])): ?>
-            <div class="alert alert-success">Registration successful! Please log in.</div>
-        <?php endif; ?>
+            <?php if (isset($error)): ?>
+                <div class="alert alert-danger"> <?= $error ?> </div>
+            <?php endif; ?>
 
-        <?php if (isset($error)): ?>
-            <div class="alert alert-danger"> <?= $error ?> </div>
-        <?php endif; ?>
+            <?php if (isset($_GET['require_login'])): ?>
+                <div class="alert alert-danger">Please Log In to Continue</div>
+            <?php endif; ?>
 
-        <?php if (isset($_GET['require_login'])): ?>
-            <div class="alert alert-danger">Please Log In to Continue</div>
-        <?php endif; ?>
+            <form method="POST">
+                <div class="mb-3">
+                    <label for="email">Merchant Email</label>
+                    <input type="email" name="email" id="email" class="form-control" required>
 
-        <form method="POST">
-            <div class="mb-3">
-                <label>Merchant Email</label>
-                <input type="email" name="email" class="form-control" required>
-            </div>
-            <div class="mb-3">
-                <label>Password</label>
-                <input type="password" name="password" class="form-control" required>
-            </div>
-            <button type="submit" class="btn btn-primary">Login</button>
-        </form>
-    </div>
+                </div>
+                <div class="mb-3">
+                    <label for="password">Password</label>
+                    <input type="password" id="password"name="password" class="form-control" required>
 
+                </div>
+                <button type="submit" class="btn btn-primary">Login</button>
+            </form>
+        </div>
+    </main>
     <?php include '../inc/footer.inc.php'; ?>
 
 </body>

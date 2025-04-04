@@ -65,7 +65,7 @@ if (isset($_SESSION['payerUrl']) && !empty($_SESSION['payerUrl'])) {
             <div class="col-md-4">
                 <div class="card mt-5 border border-5 rounded-5">
                     <div class="card-body">
-                        <h4 class="card-title">Greetings Foodie!</h4>
+                        <h1 class="card-title">Greetings Foodie!</h1>
                         <h2 class="card-subtitle mb-2 text-muted">Where are you looking to deliver your food to?</h2>
                         <br>
                         <div class="form-group">
@@ -112,7 +112,7 @@ if (isset($_SESSION['payerUrl']) && !empty($_SESSION['payerUrl'])) {
                             <img src="<?= htmlspecialchars($row['image']) ?>" class="card-img-top fixed-img"
                                 alt="store image">
                             <div class="card-body d-flex flex-column">
-                                <h5 class="card-title flex-grow-1"><?= htmlspecialchars($row['name']) ?></h5>
+                                <h3 class="card-title flex-grow-1"><?= htmlspecialchars($row['name']) ?></h3>
                             </div>
                         </div>
                     </a>

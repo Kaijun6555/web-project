@@ -34,7 +34,7 @@ $orders = $stmt->get_result();
 $stmt->close();
 
 $stmt = $conn->prepare("SELECT idmenu_item, itemName, price, availability, description, image FROM menu_item WHERE restaurant_id = ? ORDER BY itemName");
-$stmt->bind_param("i", $restaurant_id);
+$stmt->bind_param("i", $id);
 $stmt->execute();
 $menu_items = $stmt->get_result();
 $stmt->close();

@@ -12,7 +12,8 @@ if (isset($_SESSION['admin_id'])) {
     exit;
 }
 
-function sanitize_input($data) {
+function sanitize_input($data)
+{
     $data = trim($data);
     $data = stripslashes($data);
     $data = htmlspecialchars($data);
@@ -77,38 +78,43 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 ?>
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <title>Food</title>
     <?php include '../inc/head.inc.php'; ?>
 </head>
+
 <body>
     <?php include '../inc/nav.inc.php'; ?>
-    
-    <div class="container mt-4">
-        <h2>Login</h2>
-        <?php if (isset($_GET['register_success'])): ?>
-            <div class="alert alert-success">Registration successful! Please log in.</div>
-        <?php endif; ?>
-        <?php if (isset($error)): ?>
-            <div class="alert alert-danger"> <?= $error ?> </div>
-        <?php endif; ?>
-        <?php if (isset($_GET['require_login'])): ?>
-            <div class="alert alert-danger">Please Log In to Continue</div>
-        <?php endif; ?>
-        <form method="POST">
-            <div class="mb-3">
-                <label>Email</label>
-                <input type="email" name="email" class="form-control" required>
-            </div>
-            <div class="mb-3">
-                <label>Password</label>
-                <input type="password" name="password" class="form-control" required>
-            </div>
-            <button type="submit" class="btn btn-primary">Login</button>
-        </form>
-        <a href="/user/register.php">Don't have an account? Sign up Here!</a>
-    </div>
+    <main>
+        <div class="container mt-4">
+            <h1>Login</h1>
+            <?php if (isset($_GET['register_success'])): ?>
+                <div class="alert alert-success">Registration successful! Please log in.</div>
+            <?php endif; ?>
+            <?php if (isset($error)): ?>
+                <div class="alert alert-danger"> <?= $error ?> </div>
+            <?php endif; ?>
+            <?php if (isset($_GET['require_login'])): ?>
+                <div class="alert alert-danger">Please Log In to Continue</div>
+            <?php endif; ?>
+            <form method="POST">
+                <div class="mb-3">
+                    <label for="email">Email</label>
+                    <input type="email" name="email" id="email" class="form-control" required>
 
+                </div>
+                <div class="mb-3">
+                    <label for="password">Password</label>
+                    <input type="password" name="password" id="password" class="form-control" required>
+
+                </div>
+                <button type="submit" class="btn btn-primary">Login</button>
+            </form>
+            <a href="/user/register.php">Don't have an account? Sign up Here!</a>
+        </div>
+    </main>
     <?php include '../inc/footer.inc.php'; ?>
 </body>
+
 </html>
