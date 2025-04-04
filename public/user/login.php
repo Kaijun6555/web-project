@@ -2,6 +2,10 @@
 session_start();
 require '../../db/db-connect.php';
 
+// Generate a CSRF token if not already generated
+if (empty($_SESSION['csrf_token'])) {
+    $_SESSION['csrf_token'] = bin2hex(random_bytes(32));  // 32 bytes = 64 characters
+}
 // Check if the user or admin is already logged in
 if (isset($_SESSION['user_id'])) {
     header('Location: /index.php');  // Redirect to the homepage or user dashboard
@@ -21,6 +25,13 @@ function sanitize_input($data)
 }
 
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+    if (isset($_POST['csrf_token']) && $_POST['csrf_token'] === $_SESSION['csrf_token']) {
+        // Token is valid, process the form
+        // Handle the form data here
+    } else {
+        // Invalid CSRF token, reject the request
+        die("Invalid CSRF token.");
+    }
     $email = sanitize_input($_POST['email']);
     $password = $_POST['password'];
 
@@ -107,8 +118,9 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                 <div class="mb-3">
                     <label for="password">Password</label>
                     <input type="password" name="password" id="password" class="form-control" required>
-
                 </div>
+                <input type="hidden" name="csrf_token" value="<?php echo $_SESSION['csrf_token']; ?>">
+
                 <button type="submit" class="btn btn-primary">Login</button>
             </form>
             <a href="/user/register.php">Don't have an account? Sign up Here!</a>

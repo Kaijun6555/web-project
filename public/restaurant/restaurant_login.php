@@ -3,6 +3,11 @@
 session_start();
 require '../../db/db-connect.php';
 
+// Generate a CSRF token if not already generated
+if (empty($_SESSION['csrf_token'])) {
+    $_SESSION['csrf_token'] = bin2hex(random_bytes(32));  // 32 bytes = 64 characters
+}
+
 // Check if the merchant is already logged in (adjust the session variable name as needed)
 if (isset($_SESSION['restaurant_id'])) {
     header('Location: /restaurant/dashboard.php');  // Redirect to the merchant dashboard
@@ -18,6 +23,13 @@ function sanitize_input($data)
 }
 
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+    if (isset($_POST['csrf_token']) && $_POST['csrf_token'] === $_SESSION['csrf_token']) {
+        // Token is valid, process the form
+        // Handle the form data here
+    } else {
+        // Invalid CSRF token, reject the request
+        die("Invalid CSRF token.");
+    }
     $email = sanitize_input($_POST['email']);
     $password = $_POST['password'];
 
@@ -86,8 +98,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                 <div class="mb-3">
                     <label for="password">Password</label>
                     <input type="password" id="password"name="password" class="form-control" required>
-
                 </div>
+                <input type="hidden" name="csrf_token" value="<?php echo $_SESSION['csrf_token']; ?>">
                 <button type="submit" class="btn btn-primary">Login</button>
             </form>
         <a href='/restaurant/restaurant_register.php'>Register Your Merchant Here!</a>

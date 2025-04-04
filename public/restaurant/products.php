@@ -79,21 +79,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             $stmt->execute();
             $menuitem_id = $stmt->insert_id;
             $stmt->close();
-            // Now handle the question and side options
-            // if (isset($_POST['header'], $_POST['type'], $_POST['options']) && !empty($_POST['header'])) {
-            //     $header = sanitize_input($_POST['header']);
-            //     $type = $_POST['type'];
-            //     $options = explode(',', sanitize_input($_POST['options'])); // Assuming sides are separated by commas
-
-            //     // Insert the question into the product_questions table
-            //     $optionsJson = json_encode(array_map('trim', $options)); // Make sure to trim each option
-
-            //     // Insert the question and side options (as JSON) into the product_questions table
-            //     $stmt = $conn->prepare("INSERT INTO questions (menuitem_id, question, type, options) VALUES (?, ?, ?, ?)");
-            //     $stmt->bind_param("isss", $menuitem_id, $header, $type, $optionsJson);
-            //     $stmt->execute();
-            //     $stmt->close();
-            // }
             header("Location: /restaurant/products.php");
         } else {
             header("Location: /restaurant/products.php");
@@ -156,173 +141,134 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 </head>
 
 <body>
+    <main>
+        <div class="container-fluid">
+            <div class="row flex-nowrap">
+                <?php include '../inc/nav_restaurant.inc.php'; ?>
 
-    <div class="container-fluid">
-        <div class="row flex-nowrap">
-            <?php include '../inc/nav_restaurant.inc.php'; ?>
+                <div class="col py-3">
+                    <!-- Button to trigger Modal -->
+                    <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#AddProductModal">
+                        Add Product
+                    </button>
 
-            <div class="col py-3">
-                <!-- Button to trigger Modal -->
-                <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#AddProductModal">
-                    Add Product
-                </button>
-
-                <!-- Modal for adding product -->
-                <div class="modal fade" id="AddProductModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-                    <div class="modal-dialog modal-dialog-centered">
-                        <div class="modal-content">
-                            <div class="modal-header">
-                                <h5 class="modal-title" id="exampleModalLabel">Add Item</h5>
-                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                            </div>
-                            <form method="POST" enctype="multipart/form-data">
-                                <div class="modal-body">
-                                    <div class="form-group">
-                                        <label for="ItemtName">Item Name:</label>
-                                        <input type="text" class="form-control" id="ItemName" name="ItemName">
-                                    </div>
-                                    <div class="form-group">
-                                        <label for="description">Description:</label>
-                                        <input type="text" class="form-control" id="description" name="description">
-                                    </div>
-                                    <div class="form-group">
-                                        <label for="availability">Availability</label>
-                                        <select type="text" class="form-control" id="availability" name="availability">
-                                            <option value="yes">Yes</option>
-                                            <option value="no">No</option>
-                                        </select>
-                                    </div>
-                                    <div class="form-group">
-                                        <label for="price">Purchase Price:</label>
-                                        <input type="number" step=".01" class="form-control" id="price" name="price">
-                                    </div>
-                                    <div class="form-group">
-                                        <label for="image">Input link to Image of food</label>
-                                        <input type="text" class="form-control" id="image" name="image">
-                                    </div>
-                                    <!-- <div class="form-group">
-                                        <label for="header">Question (e.g., Choose a side):</label>
-                                        <input type="text" class="form-control" id="header" name="header">
-                                    </div>
-                                    <div class="form-group">
-                                        <label for="type">Type:</label>
-                                        <select type="text" class="form-control" id="type" name="type">
-                                            <option value="Single-Select">Single-Select</option>
-                                            <option value="Multi-Select">Multi-Select</option>
-                                        </select>
-                                    </div>
-                                    <div class="form-group">
-                                        <label for="options">Side Options (comma separated):</label>
-                                        <input type="text" class="form-control" id="options" name="options">
-                                    </div> -->
+                    <!-- Modal for adding product -->
+                    <div class="modal fade" id="AddProductModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                        <div class="modal-dialog modal-dialog-centered">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title" id="exampleModalLabel">Add Item</h5>
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                                 </div>
-                                <div class="modal-footer">
-                                    <button type="submit" class="btn btn-primary">Add Menu Item</button>
-                                </div>
-                            </form>
-                        </div>
-                    </div>
-                </div>
-                <!-- Modal for update product -->
-                <div class="modal fade" id="UpdateProductModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-                    <div class="modal-dialog modal-dialog-centered">
-                        <div class="modal-content">
-                            <div class="modal-header">
-                                <h5 class="modal-title" id="exampleModalLabel">Edit product</h5>
-                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                            </div>
-                            <form method="POST">
-                                <div class="modal-body">
-                                    <div class="form-group">
-                                        <label for="update-ItemName">Item Name:</label>
-                                        <input type="text" class="form-control" id="update-ItemName" name="update-ItemName">
+                                <form method="POST" enctype="multipart/form-data">
+                                    <div class="modal-body">
+                                        <div class="form-group">
+                                            <label for="ItemtName">Item Name:</label>
+                                            <input type="text" class="form-control" id="ItemName" name="ItemName">
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="description">Description:</label>
+                                            <input type="text" class="form-control" id="description" name="description">
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="availability">Availability</label>
+                                            <select type="text" class="form-control" id="availability" name="availability">
+                                                <option value="yes">Yes</option>
+                                                <option value="no">No</option>
+                                            </select>
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="price">Purchase Price:</label>
+                                            <input type="number" step=".01" class="form-control" id="price" name="price">
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="image">Input link to Image of food</label>
+                                            <input type="text" class="form-control" id="image" name="image">
+                                        </div>
                                     </div>
-                                    <div class="form-group">
-                                        <label for="update-description">Description:</label>
-                                        <input type="text" class="form-control" id="update-description" name="update-description">
+                                    <div class="modal-footer">
+                                        <button type="submit" class="btn btn-primary">Add Menu Item</button>
                                     </div>
-                                    <div class="form-group">
-                                        <label for="update-availability">Availability</label>
-                                        <select type="text" class="form-control" id="update-availability" name="update-availability">
-                                            <option value="yes">Yes</option>
-                                            <option value="no">No</option>
-                                        </select>
-                                    </div>
-                                    <div class="form-group">
-                                        <label for="update-price">Purchase Price:</label>
-                                        <input type="number" step=".01" class="form-control" id="update-price" name="update-price">
-                                    </div>
-                                    <div class="form-group">
-                                        <label for="update-image">Input link to Image of food</label>
-                                        <input type="text" class="form-control" id="update-image" name="update-image">
-                                    </div>
-                                    <input type="hidden" name="idmenu_item" id="idmenu_item">
-                                </div>
-                                <div class="modal-footer">
-                                    <button type="submit" class="btn btn-primary">Save New changes</button>
-                                </div>
-                            </form>
-
-                        </div>
-                    </div>
-                </div>
-                <!-- Modal for Delete Confirmation
-                <div class="modal fade" id="DeleteProductModal" tabindex="-1" aria-labelledby="DeleteProductModalLabel" aria-hidden="true">
-                    <div class="modal-dialog modal-dialog-centered">
-                        <div class="modal-content">
-                            <div class="modal-header">
-                                <h5 class="modal-title" id="DeleteProductModalLabel">Delete Product</h5>
-                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                            </div>
-                            <div class="modal-body">
-                                Are you sure you want to delete this product?
-                            </div>
-                            <div class="modal-footer">
-                                <form method="POST">
-                                    <input type="hidden" name="confirm_delete" id="confirm_delete">
-                                    <input type="hidden" name="delete_idmenu_item" id="delete_idmenu_item">
-                                    <button type="submit" class="btn btn-danger">Delete</button>
                                 </form>
                             </div>
                         </div>
                     </div>
-                </div> -->
-
-                <!-- Displaying Products as Cards -->
-                <div class="row mt-4">
-                    <?php while ($row = $menu_result->fetch_assoc()) : ?>
-                        <div class="col-md-4 mb-4">
-                            <div class="card">
-                                <img src="<?php echo htmlspecialchars($row['image']); ?>" class="card-img-top" alt="Product Image">
-                                <div class="card-body">
-                                    <h5 class="card-title"><?php echo htmlspecialchars($row['itemName']); ?></h5>
-                                    <p class="card-text"><?php echo htmlspecialchars($row['description']); ?></p>
-                                    <p class="card-text"><strong>Price:</strong> $<?php echo number_format($row['price'], 2); ?></p>
-                                    <p class="card-text"><strong>Availability:</strong> <?php echo htmlspecialchars($row['availability']); ?></p>
-                                    <button type="button" class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#UpdateProductModal"
-                                        data-id="<?php echo $row['idmenu_item']; ?>"
-                                        data-update-name="<?php echo htmlspecialchars($row['itemName']); ?>"
-                                        data-update-description="<?php echo htmlspecialchars($row['description']); ?>"
-                                        data-update-price="<?php echo $row['price']; ?>"
-                                        data-update-availability="<?php echo $row['availability']; ?>"
-                                        data-update-image="<?php echo htmlspecialchars($row['image']); ?>">
-                                        Edit Product
-                                    </button>
-                                    <!-- <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#DeleteProductModal"
-                                        data-delete-id="<?php echo $row['idmenu_item']; ?>"
-                                        data-confirm-delete="yes">
-                                        Delete Product
-                                    </button> -->
+                    <!-- Modal for update product -->
+                    <div class="modal fade" id="UpdateProductModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                        <div class="modal-dialog modal-dialog-centered">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title" id="exampleModalLabel">Edit product</h5>
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                                 </div>
+                                <form method="POST">
+                                    <div class="modal-body">
+                                        <div class="form-group">
+                                            <label for="update-ItemName">Item Name:</label>
+                                            <input type="text" class="form-control" id="update-ItemName" name="update-ItemName">
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="update-description">Description:</label>
+                                            <input type="text" class="form-control" id="update-description" name="update-description">
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="update-availability">Availability</label>
+                                            <select type="text" class="form-control" id="update-availability" name="update-availability">
+                                                <option value="yes">Yes</option>
+                                                <option value="no">No</option>
+                                            </select>
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="update-price">Purchase Price:</label>
+                                            <input type="number" step=".01" class="form-control" id="update-price" name="update-price">
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="update-image">Input link to Image of food</label>
+                                            <input type="text" class="form-control" id="update-image" name="update-image">
+                                        </div>
+                                        <input type="hidden" name="idmenu_item" id="idmenu_item">
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button type="submit" class="btn btn-primary">Save New changes</button>
+                                    </div>
+                                </form>
+
                             </div>
                         </div>
-                    <?php endwhile; ?>
+                    </div>
+                    <!-- Displaying Products as Cards -->
+                    <div class="row mt-4">
+                        <?php if ($menu_result->num_rows > 0): ?>
+                            <?php while ($row = $menu_result->fetch_assoc()) : ?>
+                                <div class="col-md-4 mb-4">
+                                    <div class="card">
+                                        <img src="<?php echo htmlspecialchars($row['image']); ?>" class="card-img-top" alt="Product Image">
+                                        <div class="card-body">
+                                            <h1 class="card-title"><?php echo htmlspecialchars($row['itemName']); ?></h1>
+                                            <p class="card-text"><?php echo htmlspecialchars($row['description']); ?></p>
+                                            <p class="card-text"><strong>Price:</strong> $<?php echo number_format($row['price'], 2); ?></p>
+                                            <p class="card-text"><strong>Availability:</strong> <?php echo htmlspecialchars($row['availability']); ?></p>
+                                            <button type="button" class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#UpdateProductModal"
+                                                data-id="<?php echo $row['idmenu_item']; ?>"
+                                                data-update-name="<?php echo htmlspecialchars($row['itemName']); ?>"
+                                                data-update-description="<?php echo htmlspecialchars($row['description']); ?>"
+                                                data-update-price="<?php echo $row['price']; ?>"
+                                                data-update-availability="<?php echo $row['availability']; ?>"
+                                                data-update-image="<?php echo htmlspecialchars($row['image']); ?>">
+                                                Edit Product
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            <?php endwhile; ?>
+                        <?php else : ?>
+                            <h1>No menu items available.</h1>
+                        <?php endif; ?>
+                    </div>
                 </div>
             </div>
         </div>
-    </div>
-
-
+    </main>
 </body>
 
 </html>

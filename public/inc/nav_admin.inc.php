@@ -1,25 +1,19 @@
 <div class="col-auto col-md-3 col-xl-2 px-sm-2 px-0 bg-dark">
     <div class="d-flex flex-column align-items-center align-items-sm-start px-3 pt-2 text-white min-vh-100">
-        <a href="/admin/dashboard.php" class="d-flex align-items-center pb-3 mb-md-0 me-md-auto text-white text-decoration-none">
+        <a href="/admin/dashboard.php" class="d-flex align-items-center pb-3 mb-md-0 me-md-auto text-white text-decoration-none" aria-label="ADMIN PANEL">
             <span class="fs-5 d-none d-sm-inline">ADMIN PANEL</span>
         </a>
         <ul class="nav nav-pills flex-column mb-sm-auto mb-0 align-items-center align-items-sm-start" id="menu">
             <li class="nav-item">
-                <a href="/admin/dashboard.php" class="nav-link align-middle px-0">
+                <a href="/admin/dashboard.php" class="nav-link align-middle px-0" aria-label="Dashboard">
                     <i class="fs-4 bi-house"></i>
                     <span class="ms-1 d-none d-sm-inline">Dashboard</span>
                 </a>
             </li>
             <li class="nav-item">
-                <a href="/admin/merchants_pending.php" class="nav-link align-middle px-0">
+                <a href="/admin/merchants_pending.php" class="nav-link align-middle px-0" aria-label="Pending Merchants">
                     <i class="fs-4 bi-person-check"></i>
                     <span class="ms-1 d-none d-sm-inline">Pending Merchants</span>
-                </a>
-            </li>
-            <li class="nav-item">
-                <a href="/admin/settings.php" class="nav-link align-middle px-0">
-                    <i class="fs-4 bi-gear"></i>
-                    <span class="ms-1 d-none d-sm-inline">Settings</span>
                 </a>
             </li>
         </ul>

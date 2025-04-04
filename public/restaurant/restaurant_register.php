@@ -119,7 +119,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                     <input type="email" name="email" id="email" class="form-control" required>
                 </div>
                 <div class="mb-3">
-                    <label for="address">Merchant Address</label>
+                    <label for="location">Merchant Address</label>
                     <input type="text" name="location" id="location" class="form-control" oninput="handleInput(event)" required>
                 </div>
                 <div class="mb-3">
